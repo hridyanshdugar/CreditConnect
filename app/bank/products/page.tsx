@@ -154,10 +154,10 @@ export default function ProductsPage() {
                     setFormData({ ...formData, productType: selected });
                   }}
                 >
-                  <SelectItem key="personal_loan" value="personal_loan">Personal Loan</SelectItem>
-                  <SelectItem key="auto_loan" value="auto_loan">Auto Loan</SelectItem>
-                  <SelectItem key="mortgage" value="mortgage">Mortgage</SelectItem>
-                  <SelectItem key="credit_line" value="credit_line">Credit Line</SelectItem>
+                  <SelectItem key="personal_loan">Personal Loan</SelectItem>
+                  <SelectItem key="auto_loan">Auto Loan</SelectItem>
+                  <SelectItem key="mortgage">Mortgage</SelectItem>
+                  <SelectItem key="credit_line">Credit Line</SelectItem>
                 </Select>
                 <div className="grid grid-cols-2 gap-4">
                   <Input
