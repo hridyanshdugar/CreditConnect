@@ -40,7 +40,6 @@ export default function CreditInquiriesTracker({
         <div className="flex justify-between items-center w-full">
           <div>
             <h2 className="text-xl font-semibold">Recent Credit Inquiries</h2>
-            <p className="text-sm text-default-500">New Credit (10% of credit score)</p>
           </div>
           {hasSurge && (
             <Chip color="warning" variant="flat" startContent={<AlertTriangle className="w-4 h-4" />}>

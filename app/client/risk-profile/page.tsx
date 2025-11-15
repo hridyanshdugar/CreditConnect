@@ -341,6 +341,347 @@ export default function RiskProfilePage() {
               </Card>
             )}
 
+            {/* Raw Data Metrics Section */}
+            {riskProfile && riskProfile.userData && (
+              <Card>
+                <CardHeader>
+                  <h2 className="text-xl font-semibold">Detailed Risk Assessment Data</h2>
+                </CardHeader>
+                <CardBody className="space-y-6">
+                  {/* Financial Stability Metrics */}
+                  <div>
+                    <h3 className="font-semibold text-lg mb-3 text-primary">Financial Stability Metrics</h3>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {riskProfile.userData.monthlyIncome !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Monthly Income</div>
+                          <div className="text-lg font-semibold">${riskProfile.userData.monthlyIncome.toLocaleString()}</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.monthlyIncomeVariance !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Income Variance</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.monthlyIncomeVariance.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.employmentDuration !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Employment Duration</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.employmentDuration} months</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.multipleIncomeStreams !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Income Streams</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.multipleIncomeStreams}</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.averageMonthlyBalance !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Avg Monthly Balance</div>
+                          <div className="text-lg font-semibold">${riskProfile.userData.averageMonthlyBalance.toLocaleString()}</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.overdraftFrequency !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Overdraft Frequency</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.overdraftFrequency}/month</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.savingsRate !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Savings Rate</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.savingsRate.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.emergencyFundCoverage !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Emergency Fund Coverage</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.emergencyFundCoverage} months</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.debtToIncomeRatio !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Debt-to-Income Ratio</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.debtToIncomeRatio.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.paymentTimeliness !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Payment Timeliness</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.paymentTimeliness.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.creditUtilization !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Credit Utilization</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.creditUtilization.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.debtDiversification !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Debt Diversification</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.debtDiversification}</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <Divider />
+
+                  {/* Behavioral Risk Indicators */}
+                  <div>
+                    <h3 className="font-semibold text-lg mb-3 text-secondary">Behavioral Risk Indicators</h3>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {riskProfile.userData.discretionarySpendingRatio !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Discretionary Spending</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.discretionarySpendingRatio.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.gamblingActivity !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Gambling Activity</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.gamblingActivity.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.luxurySpendingTrends !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Luxury Spending</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.luxurySpendingTrends.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.budgetAdherence !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Budget Adherence</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.budgetAdherence.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.billPaymentConsistency !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Bill Payment Consistency</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.billPaymentConsistency.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.rentPaymentHistory !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Rent Payment History</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.rentPaymentHistory.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.utilityPaymentPatterns !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Utility Payment Patterns</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.utilityPaymentPatterns.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.subscriptionManagement !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Subscription Management</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.subscriptionManagement.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.appEngagementFrequency !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">App Engagement</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.appEngagementFrequency.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.documentSubmissionTimeliness !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Document Timeliness</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.documentSubmissionTimeliness.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.profileCompleteness !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Profile Completeness</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.profileCompleteness.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.fraudRiskSignals !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Fraud Risk Signals</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.fraudRiskSignals.toFixed(1)}%</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <Divider />
+
+                  {/* Alternative Data Signals */}
+                  <div>
+                    <h3 className="font-semibold text-lg mb-3 text-success">Alternative Data Signals</h3>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {riskProfile.userData.professionalNetworkStrength !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Professional Network</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.professionalNetworkStrength.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.educationLevel !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Education Level</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.educationLevel.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.skillMarketability !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Skill Marketability</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.skillMarketability.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.geographicStability !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Geographic Stability</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.geographicStability} months</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.vehicleOwnership !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Vehicle Ownership</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.vehicleOwnership ? 'Yes' : 'No'}</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.propertyOwnership !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Property Ownership</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.propertyOwnership ? 'Yes' : 'No'}</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.investmentAccounts !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Investment Accounts</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.investmentAccounts}</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.businessOwnership !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Business Ownership</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.businessOwnership ? 'Yes' : 'No'}</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.residentialStability !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Residential Stability</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.residentialStability} months</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.familyStructure !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Family Structure</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.familyStructure}</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.healthInsuranceCoverage !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Health Insurance</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.healthInsuranceCoverage ? 'Yes' : 'No'}</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.professionalLicenses !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Professional Licenses</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.professionalLicenses}</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <Divider />
+
+                  {/* Market & Economic Environment Risk */}
+                  <div>
+                    <h3 className="font-semibold text-lg mb-3 text-warning">Market & Economic Environment Risk</h3>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {riskProfile.userData.industryVolatility !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Industry Volatility</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.industryVolatility.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.regionalEconomicHealth !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Regional Economic Health</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.regionalEconomicHealth.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.interestRateTrends !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Interest Rate Trends</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.interestRateTrends.toFixed(1)}</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.inflationImpact !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Inflation Impact</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.inflationImpact.toFixed(1)}%</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <Divider />
+
+                  {/* Fraud & Security Risk */}
+                  <div>
+                    <h3 className="font-semibold text-lg mb-3 text-danger">Fraud & Security Risk</h3>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {riskProfile.userData.documentAuthenticity !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Document Authenticity</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.documentAuthenticity.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.biometricMatchScore !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Biometric Match</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.biometricMatchScore.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.addressVerification !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Address Verification</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.addressVerification ? 'Verified' : 'Unverified'}</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.phoneNumberStability !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Phone Number Stability</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.phoneNumberStability} months</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.unusualTransferPatterns !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Unusual Transfer Patterns</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.unusualTransferPatterns.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.velocityChecks !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Velocity Checks</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.velocityChecks.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.geolocationAnomalies !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Geolocation Anomalies</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.geolocationAnomalies.toFixed(1)}%</div>
+                        </div>
+                      )}
+                      {riskProfile.userData.deviceFingerprinting !== undefined && (
+                        <div className="bg-default-50 p-3 rounded-lg">
+                          <div className="text-xs text-default-500">Device Fingerprinting</div>
+                          <div className="text-lg font-semibold">{riskProfile.userData.deviceFingerprinting.toFixed(1)}%</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardBody>
+              </Card>
+            )}
+
             {/* Credit Metrics Section */}
             {creditMetrics && (
               <div className="space-y-6">

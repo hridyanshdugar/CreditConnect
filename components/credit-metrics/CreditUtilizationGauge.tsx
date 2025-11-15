@@ -93,7 +93,6 @@ export default function CreditUtilizationGauge({
         <div className="flex items-start justify-between w-full">
           <div>
             <h2 className="text-xl font-semibold">Credit Utilization</h2>
-            <p className="text-sm text-default-500">Amounts Owed (30% of credit score)</p>
           </div>
           <Chip 
             color={getChipColor()} 

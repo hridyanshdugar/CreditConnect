@@ -61,7 +61,7 @@ export interface DimensionScores {
   financial: number;
   behavioral: number;
   alternative: number;
-  environmental: number;
+  economic_environment: number;
   fraud: number;
 }
 
@@ -80,7 +80,7 @@ export interface RiskProfile {
   financialStabilityScore?: number;
   behavioralRiskScore?: number;
   alternativeDataScore?: number;
-  environmentalRiskScore?: number;
+  economicEnvironmentScore?: number;
   fraudRiskScore?: number;
   confidenceInterval?: number;
   flags: RiskFlags;

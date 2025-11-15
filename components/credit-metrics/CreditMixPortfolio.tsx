@@ -62,7 +62,6 @@ export default function CreditMixPortfolio({
       <CardHeader>
         <div>
           <h2 className="text-xl font-semibold">Your Credit Type Portfolio</h2>
-          <p className="text-sm text-default-500">Credit Mix (10% of credit score)</p>
         </div>
       </CardHeader>
       <CardBody className="space-y-6">

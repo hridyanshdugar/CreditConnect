@@ -111,7 +111,7 @@ export class DataPipeline {
           stability_index, affordability_ratio, reliability_score,
           cash_flow_score, asset_score, behavior_score, fraud_score,
           financial_stability_score, behavioral_risk_score,
-          alternative_data_score, environmental_risk_score, fraud_risk_score,
+          alternative_data_score, economic_environment_score, fraud_risk_score,
           confidence_interval, flags, explanation, created_at, updated_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).run(
@@ -129,7 +129,7 @@ export class DataPipeline {
         result.dimensionScores.financial,
         result.dimensionScores.behavioral,
         result.dimensionScores.alternative,
-        result.dimensionScores.environmental,
+        result.dimensionScores.economic_environment,
         result.dimensionScores.fraud,
         result.confidenceInterval,
         JSON.stringify(result.flags),

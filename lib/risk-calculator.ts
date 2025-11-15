@@ -65,7 +65,7 @@ export interface DimensionScores {
   financial: number;
   behavioral: number;
   alternative: number;
-  environmental: number;
+  economic_environment: number;
   fraud: number;
 }
 
@@ -101,7 +101,7 @@ export class HelixRiskCalculator {
     financial_stability: 0.35,
     behavioral_risk: 0.25,
     alternative_data: 0.20,
-    environmental_risk: 0.10,
+    economic_environment: 0.10,
     fraud_risk: 0.10,
   };
 
@@ -125,7 +125,7 @@ export class HelixRiskCalculator {
       financial: financialScore.score,
       behavioral: behavioralScore.score,
       alternative: alternativeScore.score,
-      environmental: environmentalScore.score,
+      economic_environment: environmentalScore.score,
       fraud: fraudScore.score,
     };
 
@@ -134,7 +134,7 @@ export class HelixRiskCalculator {
       financialScore.score * this.riskDimensions.financial_stability +
       behavioralScore.score * this.riskDimensions.behavioral_risk +
       alternativeScore.score * this.riskDimensions.alternative_data +
-      environmentalScore.score * this.riskDimensions.environmental_risk +
+      environmentalScore.score * this.riskDimensions.economic_environment +
       fraudScore.score * this.riskDimensions.fraud_risk;
 
     // Calculate confidence
@@ -142,7 +142,7 @@ export class HelixRiskCalculator {
       financial: financialScore.confidence,
       behavioral: behavioralScore.confidence,
       alternative: alternativeScore.confidence,
-      environmental: environmentalScore.confidence,
+      economic_environment: environmentalScore.confidence,
       fraud: fraudScore.confidence,
     });
 
@@ -157,7 +157,7 @@ export class HelixRiskCalculator {
         financial: financialScore.factors,
         behavioral: behavioralScore.factors,
         alternative: alternativeScore.factors,
-        environmental: environmentalScore.factors,
+        economic_environment: environmentalScore.factors,
         fraud: fraudScore.factors,
       }
     );
@@ -744,7 +744,7 @@ export class HelixRiskCalculator {
         factor: f.factor,
         impact: Math.abs(f.impact - 50),
         direction: f.impact < 50 ? 'positive' : 'negative' as 'positive' | 'negative',
-        explanation: `${f.dimension}: ${f.factor}`,
+        explanation: f.dimension,
       }));
 
     explanation.keyFactors = topFactors;

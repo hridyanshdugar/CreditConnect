@@ -85,11 +85,12 @@ export function initDatabase() {
       financial_stability_score REAL,
       behavioral_risk_score REAL,
       alternative_data_score REAL,
-      environmental_risk_score REAL,
+      economic_environment_score REAL,
       fraud_risk_score REAL,
       confidence_interval REAL,
       flags TEXT, -- JSON string
       explanation TEXT, -- JSON string
+      user_data TEXT, -- JSON string
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users(id)

@@ -34,7 +34,6 @@ export default function CreditAgeTimeline({
       <CardHeader>
         <div>
           <h2 className="text-xl font-semibold">Your Credit Age</h2>
-          <p className="text-sm text-default-500">Length of Credit History (15% of credit score)</p>
         </div>
       </CardHeader>
       <CardBody className="space-y-6">
