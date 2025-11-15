@@ -166,11 +166,11 @@ export default function MarketplacePage() {
           <CardBody>
             <div className="grid md:grid-cols-4 gap-4 mb-4">
               <Input
-                label="Loan Amount ($)"
+                label={needs.productType === 'credit_card' ? "Credit Limit ($)" : "Loan Amount ($)"}
                 type="number"
                 value={needs.amount}
                 onChange={(e) => setNeeds({ ...needs, amount: e.target.value })}
-                placeholder="e.g. 10000"
+                placeholder={needs.productType === 'credit_card' ? "e.g. 5000" : "e.g. 10000"}
               />
               <Input
                 label="Term (months)"
@@ -178,6 +178,7 @@ export default function MarketplacePage() {
                 value={needs.termMonths}
                 onChange={(e) => setNeeds({ ...needs, termMonths: e.target.value })}
                 placeholder="e.g. 36"
+                isDisabled={needs.productType === 'credit_card'}
               />
               <Select
                 label="Product Type"
@@ -188,6 +189,7 @@ export default function MarketplacePage() {
                 }}
                 placeholder="All Types"
               >
+                <SelectItem key="credit_card">Credit Card</SelectItem>
                 <SelectItem key="personal_loan">Personal Loan</SelectItem>
                 <SelectItem key="auto_loan">Auto Loan</SelectItem>
                 <SelectItem key="mortgage">Mortgage</SelectItem>
@@ -220,6 +222,7 @@ export default function MarketplacePage() {
                 }}
                 placeholder="All Types"
               >
+                <SelectItem key="credit_card">Credit Card</SelectItem>
                 <SelectItem key="personal_loan">Personal Loan</SelectItem>
                 <SelectItem key="auto_loan">Auto Loan</SelectItem>
                 <SelectItem key="mortgage">Mortgage</SelectItem>
@@ -344,23 +347,32 @@ export default function MarketplacePage() {
                       <p className="text-2xl font-bold">{match.pricing.interestRate.toFixed(2)}%</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">Max Amount</p>
+                      <p className="text-sm text-gray-600">
+                        {match.product.productType === 'credit_card' ? 'Max Credit Limit' : 'Max Amount'}
+                      </p>
                       <p className="text-2xl font-bold">${match.pricing.maxAmount.toLocaleString()}</p>
                     </div>
                   </div>
-                  <div className="mb-4">
-                    <p className="text-sm text-gray-600 mb-2">Available Terms</p>
-                    <div className="flex gap-2">
-                      {match.pricing.terms.map((term: number) => (
-                        <Chip key={term} variant="flat" size="sm">
-                          {term} months
-                        </Chip>
-                      ))}
+                  {match.product.productType !== 'credit_card' && match.pricing.terms && match.pricing.terms.length > 0 && (
+                    <div className="mb-4">
+                      <p className="text-sm text-gray-600 mb-2">Available Terms</p>
+                      <div className="flex gap-2">
+                        {match.pricing.terms.map((term: number) => (
+                          <Chip key={term} variant="flat" size="sm">
+                            {term} months
+                          </Chip>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
+                  {match.product.productType === 'credit_card' && (
+                    <div className="mb-4">
+                      <p className="text-sm text-gray-600">Revolving credit - Pay over time with minimum payments</p>
+                    </div>
+                  )}
                   {match.pricing.originationFee > 0 && (
                     <p className="text-sm text-gray-600 mb-4">
-                      Origination Fee: ${match.pricing.originationFee.toFixed(2)}
+                      {match.product.productType === 'credit_card' ? 'Annual Fee' : 'Origination Fee'}: ${match.pricing.originationFee.toFixed(2)}
                     </p>
                   )}
                   <Button color="primary" fullWidth>

@@ -117,7 +117,7 @@ export function initDatabase() {
       bank_id TEXT NOT NULL,
       name TEXT NOT NULL,
       description TEXT,
-      product_type TEXT NOT NULL CHECK(product_type IN ('personal_loan', 'auto_loan', 'mortgage', 'credit_line', 'student_loan', 'home_equity', 'business_loan')),
+      product_type TEXT NOT NULL CHECK(product_type IN ('personal_loan', 'auto_loan', 'mortgage', 'credit_card', 'credit_line', 'student_loan', 'home_equity', 'business_loan')),
       min_helix_score INTEGER,
       max_helix_score INTEGER,
       base_interest_rate REAL NOT NULL,
