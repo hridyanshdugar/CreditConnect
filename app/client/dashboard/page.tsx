@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardBody, CardHeader, Button, Progress, Chip } from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Progress } from '@heroui/react';
 import AppNavbar from '@/components/Navbar';
 import CreditScoreBreakdown from '@/components/credit-metrics/CreditScoreBreakdown';
 import Link from 'next/link';
@@ -79,57 +79,55 @@ export default function ClientDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <AppNavbar user={user} />
-      <main className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Client Dashboard</h1>
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
+        <h1 className="text-3xl font-bold mb-10 text-default-900">Client Dashboard</h1>
 
         {riskProfile ? (
           <div className="grid md:grid-cols-2 gap-6 mb-8">
-            <Card>
-              <CardHeader>
-                <h2 className="text-xl font-semibold">Helix Grade</h2>
+            <Card className="shadow-lg">
+              <CardHeader className="pb-2">
+                <h2 className="text-xl font-semibold text-default-700">Helix Grade</h2>
               </CardHeader>
-              <CardBody>
-                <div className="text-center">
-                  <div className="text-6xl font-bold mb-4" style={{ color: `var(--${getGradeColor(riskProfile.helixGrade || 'C')}-500)` }}>
+              <CardBody className="pt-4 pb-8">
+                <div className="flex flex-col items-center justify-center min-h-[200px]">
+                  <div 
+                    className="text-8xl font-bold mb-8 tracking-tight" 
+                    style={{ color: `var(--${getGradeColor(riskProfile.helixGrade || 'C')}-500)` }}
+                  >
                     {riskProfile.helixGrade || 'N/A'}
                   </div>
-                  <Chip 
-                    color={getGradeColor(riskProfile.helixGrade || 'C') as 'success' | 'primary' | 'warning' | 'danger' | 'default'} 
-                    variant="flat" 
-                    size="lg"
-                  >
-                    Grade {riskProfile.helixGrade || 'N/A'}
-                  </Chip>
-                  <div className="mt-4">
+                  <div className="w-full max-w-sm px-4">
                     <Progress
                       value={100 - (riskProfile.helixScore || 50)}
                       color={getGradeColor(riskProfile.helixGrade || 'C') as 'success' | 'primary' | 'warning' | 'danger' | 'default'}
-                      className="max-w-md"
+                      size="lg"
+                      className="w-full"
+                      aria-label="Risk score progress"
                     />
-                    <p className="text-sm text-gray-500 mt-2">
-                      Risk Score: {(riskProfile.helixScore || 0).toFixed(1)}
-                    </p>
                   </div>
                 </div>
               </CardBody>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <h2 className="text-xl font-semibold">Dimension Scores</h2>
+            <Card className="shadow-lg">
+              <CardHeader className="pb-2">
+                <h2 className="text-xl font-semibold text-default-700">Dimension Scores</h2>
               </CardHeader>
-              <CardBody>
-                <div className="space-y-4">
+              <CardBody className="pt-4">
+                <div className="space-y-5">
                   {Object.entries(riskProfile.dimensionScores || {}).map(([key, value]: [string, any]) => (
-                    <div key={key}>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-sm capitalize">{key.replace('_', ' ')}</span>
-                        <span className="text-sm font-semibold">{value.toFixed(1)}</span>
+                    <div key={key} className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium text-default-600 capitalize">
+                          {key.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        </span>
+                        <span className="text-sm font-semibold text-default-800">{value.toFixed(1)}</span>
                       </div>
                       <Progress
                         value={100 - value}
-                        color={getRiskColor(value)}
-                        size="sm"
+                        color={getRiskColor(value) as 'success' | 'primary' | 'warning' | 'danger'}
+                        size="md"
+                        className="w-full"
                       />
                     </div>
                   ))}
@@ -157,7 +155,7 @@ export default function ClientDashboard() {
           {/* <CreditScoreBreakdown /> */}
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-6 mt-10">
           <Card 
             isPressable 
             as={Link} 

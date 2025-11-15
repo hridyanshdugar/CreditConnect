@@ -151,20 +151,49 @@ async function createDemoUsers() {
   ];
 
   for (const client of clientData) {
-    const userId = randomUUID();
-    const passwordHash = await hashPassword(DEMO_PASSWORD);
+    // Check if user already exists
+    const existingUser = db.prepare('SELECT id FROM users WHERE email = ?').get(client.email) as any;
+    let userId: string;
+    
+    if (existingUser) {
+      userId = existingUser.id;
+      // Update existing user
+      const passwordHash = await hashPassword(DEMO_PASSWORD);
+      const now = new Date().toISOString();
+      db.prepare(`
+        UPDATE users 
+        SET password_hash = ?, first_name = ?, last_name = ?, updated_at = ?
+        WHERE id = ?
+      `).run(passwordHash, client.firstName, client.lastName, now, userId);
+    } else {
+      userId = randomUUID();
+      const passwordHash = await hashPassword(DEMO_PASSWORD);
+      const now = new Date().toISOString();
+      db.prepare(`
+        INSERT INTO users (id, email, password_hash, role, first_name, last_name, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(userId, client.email, passwordHash, 'client', client.firstName, client.lastName, now, now);
+    }
+
+    // Check if profile already exists
+    const existingProfile = db.prepare('SELECT id FROM client_profiles WHERE user_id = ?').get(userId) as any;
+    let profileId: string;
     const now = new Date().toISOString();
-
-    db.prepare(`
-      INSERT INTO users (id, email, password_hash, role, first_name, last_name, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(userId, client.email, passwordHash, 'client', client.firstName, client.lastName, now, now);
-
-    const profileId = randomUUID();
-    db.prepare(`
-      INSERT INTO client_profiles (id, user_id, monthly_income, employment_duration, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).run(profileId, userId, client.profile.monthlyIncome, client.profile.employmentDuration, now, now);
+    
+    if (existingProfile) {
+      profileId = existingProfile.id;
+      db.prepare(`
+        UPDATE client_profiles 
+        SET monthly_income = ?, employment_duration = ?, updated_at = ?
+        WHERE id = ?
+      `).run(client.profile.monthlyIncome, client.profile.employmentDuration, now, profileId);
+    } else {
+      profileId = randomUUID();
+      db.prepare(`
+        INSERT INTO client_profiles (id, user_id, monthly_income, employment_duration, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `).run(profileId, userId, client.profile.monthlyIncome, client.profile.employmentDuration, now, now);
+    }
 
     clients.push({ userId, profileId, email: client.email, profile: client.profile });
   }
@@ -179,20 +208,47 @@ async function createDemoUsers() {
   ];
 
   for (const bank of bankData) {
-    const userId = randomUUID();
-    const passwordHash = await hashPassword(DEMO_PASSWORD);
+    // Check if user already exists
+    const existingUser = db.prepare('SELECT id FROM users WHERE email = ?').get(bank.email) as any;
+    let userId: string;
     const now = new Date().toISOString();
+    
+    if (existingUser) {
+      userId = existingUser.id;
+      // Update existing user
+      const passwordHash = await hashPassword(DEMO_PASSWORD);
+      db.prepare(`
+        UPDATE users 
+        SET password_hash = ?, first_name = ?, last_name = ?, updated_at = ?
+        WHERE id = ?
+      `).run(passwordHash, 'Bank', 'Admin', now, userId);
+    } else {
+      userId = randomUUID();
+      const passwordHash = await hashPassword(DEMO_PASSWORD);
+      db.prepare(`
+        INSERT INTO users (id, email, password_hash, role, first_name, last_name, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(userId, bank.email, passwordHash, 'bank', 'Bank', 'Admin', now, now);
+    }
 
-    db.prepare(`
-      INSERT INTO users (id, email, password_hash, role, first_name, last_name, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(userId, bank.email, passwordHash, 'bank', 'Bank', 'Admin', now, now);
-
-    const bankProfileId = randomUUID();
-    db.prepare(`
-      INSERT INTO bank_profiles (id, user_id, bank_name, contact_email, created_at)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(bankProfileId, userId, bank.name, bank.email, now);
+    // Check if bank profile already exists
+    const existingBankProfile = db.prepare('SELECT id FROM bank_profiles WHERE user_id = ?').get(userId) as any;
+    let bankProfileId: string;
+    
+    if (existingBankProfile) {
+      bankProfileId = existingBankProfile.id;
+      db.prepare(`
+        UPDATE bank_profiles 
+        SET bank_name = ?, contact_email = ?
+        WHERE id = ?
+      `).run(bank.name, bank.email, bankProfileId);
+    } else {
+      bankProfileId = randomUUID();
+      db.prepare(`
+        INSERT INTO bank_profiles (id, user_id, bank_name, contact_email, created_at)
+        VALUES (?, ?, ?, ?, ?)
+      `).run(bankProfileId, userId, bank.name, bank.email, now);
+    }
 
     banks.push({ userId, bankProfileId, email: bank.email, bankName: bank.name });
   }
@@ -1645,69 +1701,42 @@ async function createSampleFinancialDocuments(clients: any[]) {
 }
 
 function clearDemoData() {
-  console.log('🗑️  Clearing existing demo data...');
+  console.log('🗑️  Resetting database - clearing all data...');
   
-  const demoEmails = [
-    'prime@demo.com',
-    'nearprime@demo.com',
-    'subprime@demo.com',
-    'rbc@demo.com',
-    'td@demo.com',
-    'scotiabank@demo.com',
-    'bmo@demo.com',
-    'cibc@demo.com',
-  ];
-
-  // Get all demo user IDs first
-  const demoUserIds: string[] = [];
-  for (const email of demoEmails) {
-    const user = db.prepare('SELECT id FROM users WHERE email = ?').get(email) as any;
-    if (user) {
-      demoUserIds.push(user.id);
-    }
+  try {
+    // Disable foreign key constraints temporarily for faster deletion
+    db.pragma('foreign_keys = OFF');
+    
+    // Delete all data from all tables in correct order (respecting dependencies)
+    // Start with child tables that have foreign keys
+    
+    // Delete all data from tables with foreign keys first
+    db.prepare('DELETE FROM risk_alerts').run();
+    db.prepare('DELETE FROM risk_profile_history').run();
+    db.prepare('DELETE FROM risk_profiles').run();
+    db.prepare('DELETE FROM financial_data').run();
+    db.prepare('DELETE FROM applications').run();
+    db.prepare('DELETE FROM product_matches').run();
+    db.prepare('DELETE FROM risk_improvement_goals').run();
+    db.prepare('DELETE FROM products').run();
+    db.prepare('DELETE FROM client_profiles').run();
+    db.prepare('DELETE FROM bank_profiles').run();
+    
+    // Finally, delete all users
+    db.prepare('DELETE FROM users').run();
+    
+    // Re-enable foreign key constraints
+    db.pragma('foreign_keys = ON');
+    
+    // VACUUM to reclaim space and optimize database
+    db.exec('VACUUM');
+    
+    console.log('   ✅ Database reset complete - all data cleared.');
+  } catch (error: any) {
+    console.error('   ⚠️  Error clearing database:', error.message);
+    // Re-enable foreign keys even if there was an error
+    db.pragma('foreign_keys = ON');
+    throw error;
   }
-
-  if (demoUserIds.length === 0) {
-    console.log('   No existing demo data found.');
-    return;
-  }
-
-  // Delete all related data for demo users (in order to respect foreign key constraints)
-  const userIdPlaceholders = demoUserIds.map(() => '?').join(',');
-  
-  // Delete in order to respect foreign key constraints
-  db.prepare(`DELETE FROM risk_alerts WHERE user_id IN (${userIdPlaceholders})`).run(...demoUserIds);
-  db.prepare(`DELETE FROM risk_profile_history WHERE user_id IN (${userIdPlaceholders})`).run(...demoUserIds);
-  db.prepare(`DELETE FROM risk_profiles WHERE user_id IN (${userIdPlaceholders})`).run(...demoUserIds);
-  db.prepare(`DELETE FROM financial_data WHERE user_id IN (${userIdPlaceholders})`).run(...demoUserIds);
-  db.prepare(`DELETE FROM applications WHERE user_id IN (${userIdPlaceholders})`).run(...demoUserIds);
-  db.prepare(`DELETE FROM product_matches WHERE user_id IN (${userIdPlaceholders})`).run(...demoUserIds);
-  db.prepare(`DELETE FROM risk_improvement_goals WHERE user_id IN (${userIdPlaceholders})`).run(...demoUserIds);
-  db.prepare(`DELETE FROM client_profiles WHERE user_id IN (${userIdPlaceholders})`).run(...demoUserIds);
-  
-  // Delete products created by demo banks
-  const demoBankIds: string[] = [];
-  for (const email of demoEmails.slice(3)) { // Bank emails start from index 3
-    const user = db.prepare('SELECT id FROM users WHERE email = ?').get(email) as any;
-    if (user) {
-      const bankProfile = db.prepare('SELECT id FROM bank_profiles WHERE user_id = ?').get(user.id) as any;
-      if (bankProfile) {
-        demoBankIds.push(bankProfile.id);
-      }
-    }
-  }
-  
-  if (demoBankIds.length > 0) {
-    const bankIdPlaceholders = demoBankIds.map(() => '?').join(',');
-    db.prepare(`DELETE FROM product_matches WHERE product_id IN (SELECT id FROM products WHERE bank_id IN (${bankIdPlaceholders}))`).run(...demoBankIds);
-    db.prepare(`DELETE FROM applications WHERE bank_id IN (${bankIdPlaceholders})`).run(...demoBankIds);
-    db.prepare(`DELETE FROM products WHERE bank_id IN (${bankIdPlaceholders})`).run(...demoBankIds);
-    db.prepare(`DELETE FROM bank_profiles WHERE id IN (${bankIdPlaceholders})`).run(...demoBankIds);
-  }
-  
-  // Finally, delete the users
-  db.prepare(`DELETE FROM users WHERE id IN (${userIdPlaceholders})`).run(...demoUserIds);
-  
-  console.log(`   Cleared demo data for ${demoUserIds.length} users and ${demoBankIds.length} banks.`);
 }
 
