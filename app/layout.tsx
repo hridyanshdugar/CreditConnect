@@ -3,8 +3,8 @@ import { Providers } from "@/components/providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Credit Connect - AI-Powered Lending Platform",
-  description: "Revolutionary lending platform with proprietary risk assessment",
+  title: "Credit Alt Submit - AI-Powered Lending Platform",
+  description: "Revolutionary lending platform with proprietary risk assessment - Submit your application, transform your future",
 };
 
 export default function RootLayout({

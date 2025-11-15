@@ -1,4 +1,4 @@
-// Type definitions for Credit Connect
+// Type definitions for Credit Alt Submit
 
 export type UserRole = 'client' | 'bank' | 'admin';
 

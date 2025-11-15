@@ -29,8 +29,8 @@ export default function Home() {
       <AppNavbar user={user} />
       <main className="container mx-auto px-4 py-16">
         <div className="text-center mb-16">
-          <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Credit Connect
+          <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-green-500 via-blue-500 to-orange-500 bg-clip-text text-transparent">
+            Credit Alt Submit
           </h1>
           <p className="text-2xl text-foreground-500 mb-8">
             AI-Powered Lending Platform with Proprietary Risk Assessment

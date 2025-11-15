@@ -1,6 +1,8 @@
-# Credit Connect - AI-Powered Lending Platform
+# Credit Alt Submit - AI-Powered Lending Platform
 
 A revolutionary lending platform that replaces traditional credit scores with proprietary AI-driven risk profiles, enabling instant pre-approvals and Straight-Through Processing (STP) efficiency.
+
+_Submit your application, transform your future - Ctrl+Alt+Submit your way to better credit!_
 
 ## 🎯 Mission Statement
 
@@ -605,4 +607,4 @@ Built with modern web technologies to revolutionize the lending industry through
 
 **Built with ❤️ for revolutionizing the lending industry.**
 
-*Credit Connect - Where AI meets Financial Inclusion*
+*Credit Alt Submit - Where AI meets Financial Inclusion - Submit Your Way to Better Credit!*

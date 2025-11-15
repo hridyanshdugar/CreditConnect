@@ -3,6 +3,7 @@
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Button } from '@heroui/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import MinecraftLogo from './MinecraftLogo';
 
 export default function AppNavbar({ user }: { user?: { id: string; email: string; role: string } | null }) {
   const router = useRouter();
@@ -15,8 +16,8 @@ export default function AppNavbar({ user }: { user?: { id: string; email: string
   return (
     <Navbar maxWidth="full" className="px-4 sm:px-8 lg:px-12">
       <NavbarBrand className="flex-grow-0 mr-auto">
-        <Link href="/" className="font-bold text-inherit">
-          Credit Connect
+        <Link href="/" className="flex items-center gap-2 group">
+          <MinecraftLogo className="transition-transform group-hover:scale-110" />
         </Link>
       </NavbarBrand>
       <NavbarContent justify="end" className="gap-2 flex-grow-0 ml-auto">

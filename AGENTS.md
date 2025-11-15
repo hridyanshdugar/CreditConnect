@@ -1,4 +1,4 @@
-# 🚀 Agent Document: Credit Connect with Integrated Risk Calculator
+# 🚀 Agent Document: Credit Alt Submit with Integrated Risk Calculator
 
 ## 🎯 Mission Statement
 To disrupt the finance industry's borrowing and lending process by providing an AI-driven, end-to-end digital exchange that replaces credit scores with proprietary risk profiles, enabling instant, trust-based pre-approvals for clients and achieving Straight-Through Processing (STP) efficiency for lenders.
@@ -713,7 +713,7 @@ performance_requirements:
 
 ## X. Core Value Proposition
 
-The Credit Connect revolutionizes lending through:
+Credit Alt Submit revolutionizes lending through:
 
 1. **Beyond Credit Scores**: Proprietary AI-driven risk assessment using 100+ alternative data signals
 2. **Instant Pre-Approvals**: Real-time risk calculation enables guaranteed offers without hard credit pulls
