@@ -93,17 +93,21 @@ export default function ClientDashboard() {
                   <div className="text-6xl font-bold mb-4" style={{ color: `var(--${getGradeColor(riskProfile.helixGrade || 'C')}-500)` }}>
                     {riskProfile.helixGrade || 'N/A'}
                   </div>
-                  <Chip color={getGradeColor(riskProfile.helixGrade || 'C')} variant="flat" size="lg">
+                  <Chip 
+                    color={getGradeColor(riskProfile.helixGrade || 'C') as 'success' | 'primary' | 'warning' | 'danger' | 'default'} 
+                    variant="flat" 
+                    size="lg"
+                  >
                     Grade {riskProfile.helixGrade || 'N/A'}
                   </Chip>
                   <div className="mt-4">
                     <Progress
-                      value={100 - riskProfile.helixScore}
-                      color={getGradeColor(riskProfile.helixGrade || 'C')}
+                      value={100 - (riskProfile.helixScore || 50)}
+                      color={getGradeColor(riskProfile.helixGrade || 'C') as 'success' | 'primary' | 'warning' | 'danger' | 'default'}
                       className="max-w-md"
                     />
                     <p className="text-sm text-gray-500 mt-2">
-                      Risk Score: {riskProfile.helixScore.toFixed(1)}
+                      Risk Score: {(riskProfile.helixScore || 0).toFixed(1)}
                     </p>
                   </div>
                 </div>
