@@ -98,10 +98,10 @@ export default function RegisterPage() {
                   setFormData({ ...formData, role: selected as 'client' | 'bank' });
                 }}
               >
-                <SelectItem key="client" value="client">
+                <SelectItem key="client">
                   Client
                 </SelectItem>
-                <SelectItem key="bank" value="bank">
+                <SelectItem key="bank">
                   Bank
                 </SelectItem>
               </Select>
