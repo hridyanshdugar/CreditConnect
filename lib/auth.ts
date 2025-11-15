@@ -8,6 +8,9 @@ if (!JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable is required. Please set it in your .env file.');
 }
 
+// Type assertion: JWT_SECRET is guaranteed to be a string after the check above
+const JWT_SECRET_KEY: string = JWT_SECRET;
+
 export interface AuthUser {
   id: string;
   email: string;
@@ -26,12 +29,12 @@ export async function verifyPassword(
 }
 
 export function generateToken(user: AuthUser): string {
-  return jwt.sign(user, JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign(user, JWT_SECRET_KEY, { expiresIn: '7d' });
 }
 
 export function verifyToken(token: string): AuthUser | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as AuthUser;
+    return jwt.verify(token, JWT_SECRET_KEY) as AuthUser;
   } catch {
     return null;
   }
