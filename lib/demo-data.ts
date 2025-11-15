@@ -24,8 +24,8 @@ interface DemoUser {
 export async function seedDemoData() {
   console.log('🌱 Seeding demo data...');
 
-  // Clear existing demo data (optional - comment out if you want to preserve data)
-  // clearDemoData();
+  // Always clear existing demo data before seeding
+  clearDemoData();
 
   // Create demo users
   const users = await createDemoUsers();
@@ -71,86 +71,8 @@ async function createDemoUsers() {
   const clients: any[] = [];
   const banks: any[] = [];
 
-  // Check if demo users already exist
-  const existingPrime = db.prepare('SELECT id FROM users WHERE email = ?').get('prime@demo.com') as any;
-  const existingNearPrime = db.prepare('SELECT id FROM users WHERE email = ?').get('nearprime@demo.com') as any;
-  const existingSubprime = db.prepare('SELECT id FROM users WHERE email = ?').get('subprime@demo.com') as any;
-  
-  if (existingPrime && existingNearPrime && existingSubprime) {
-    console.log('⚠️  Demo users already exist. Skipping user creation.');
-    // Fetch existing users with their profile data
-    const primeUser = db.prepare('SELECT id FROM users WHERE email = ?').get('prime@demo.com') as any;
-    const nearPrimeUser = db.prepare('SELECT id FROM users WHERE email = ?').get('nearprime@demo.com') as any;
-    const subprimeUser = db.prepare('SELECT id FROM users WHERE email = ?').get('subprime@demo.com') as any;
-    
-    const primeProfile = db.prepare('SELECT id FROM client_profiles WHERE user_id = ?').get(primeUser.id) as any;
-    const nearPrimeProfile = db.prepare('SELECT id FROM client_profiles WHERE user_id = ?').get(nearPrimeUser.id) as any;
-    const subprimeProfile = db.prepare('SELECT id FROM client_profiles WHERE user_id = ?').get(subprimeUser.id) as any;
-    
-    // Store profile data for risk calculation
-    const profileDataMap: Record<string, any> = {
-      'prime@demo.com': {
-        monthlyIncome: 8500,
-        employmentDuration: 72,
-        debtToIncomeRatio: 0.22,
-        paymentTimeliness: 98,
-        averageMonthlyBalance: 18000,
-        savingsRate: 0.25,
-        emergencyFundCoverage: 8,
-        propertyOwnership: true,
-        vehicleOwnership: true,
-        investmentAccounts: 3,
-        educationLevel: 90,
-        residentialStability: 60,
-      },
-      'nearprime@demo.com': {
-        monthlyIncome: 5200,
-        employmentDuration: 24,
-        debtToIncomeRatio: 0.38,
-        paymentTimeliness: 85,
-        averageMonthlyBalance: 3500,
-        savingsRate: 0.12,
-        emergencyFundCoverage: 3,
-        propertyOwnership: false,
-        vehicleOwnership: true,
-        investmentAccounts: 1,
-        educationLevel: 70,
-        residentialStability: 18,
-      },
-      'subprime@demo.com': {
-        monthlyIncome: 3200,
-        employmentDuration: 8,
-        debtToIncomeRatio: 0.58,
-        paymentTimeliness: 68,
-        averageMonthlyBalance: 800,
-        savingsRate: 0.03,
-        emergencyFundCoverage: 0.5,
-        propertyOwnership: false,
-        vehicleOwnership: false,
-        investmentAccounts: 0,
-        educationLevel: 50,
-        residentialStability: 6,
-      },
-    };
-    
-    clients.push({ userId: primeUser.id, profileId: primeProfile?.id, email: 'prime@demo.com', profile: profileDataMap['prime@demo.com'] });
-    clients.push({ userId: nearPrimeUser.id, profileId: nearPrimeProfile?.id, email: 'nearprime@demo.com', profile: profileDataMap['nearprime@demo.com'] });
-    clients.push({ userId: subprimeUser.id, profileId: subprimeProfile?.id, email: 'subprime@demo.com', profile: profileDataMap['subprime@demo.com'] });
-    
-    // Fetch existing banks
-    const bankEmails = ['rbc@demo.com', 'td@demo.com', 'scotiabank@demo.com', 'bmo@demo.com', 'cibc@demo.com'];
-    for (const email of bankEmails) {
-      const user = db.prepare('SELECT id FROM users WHERE email = ?').get(email) as any;
-      if (user) {
-        const bankProfile = db.prepare('SELECT id, bank_name FROM bank_profiles WHERE user_id = ?').get(user.id) as any;
-        if (bankProfile) {
-          banks.push({ userId: user.id, bankProfileId: bankProfile.id, email, bankName: bankProfile.bank_name });
-        }
-      }
-    }
-    
-    return { clients, banks };
-  }
+  // Always create fresh demo users (clearDemoData already removed old ones)
+  console.log('   Creating demo users...');
 
   // Create 3 client users with different profiles
   const clientData = [
@@ -338,12 +260,8 @@ async function createRiskProfiles(clients: any[]) {
 }
 
 async function createProducts(banks: any[]) {
-  // Check if products already exist for any bank
-  const existingProducts = db.prepare('SELECT COUNT(*) as count FROM products').get() as any;
-  if (existingProducts && existingProducts.count > 0) {
-    console.log('⚠️  Products already exist. Skipping product creation.');
-    return;
-  }
+  console.log('   Creating bank products...');
+  // Always create fresh products (clearDemoData already removed old ones)
 
   // Canadian banking products - realistic offerings
   const products = [
@@ -981,8 +899,8 @@ async function createSampleFinancialDocuments(clients: any[]) {
 }
 
 function clearDemoData() {
-  // Optional: Clear existing demo data
-  // Uncomment if you want to reset demo data on each run
+  console.log('🗑️  Clearing existing demo data...');
+  
   const demoEmails = [
     'prime@demo.com',
     'nearprime@demo.com',
@@ -994,11 +912,56 @@ function clearDemoData() {
     'cibc@demo.com',
   ];
 
+  // Get all demo user IDs first
+  const demoUserIds: string[] = [];
   for (const email of demoEmails) {
     const user = db.prepare('SELECT id FROM users WHERE email = ?').get(email) as any;
     if (user) {
-      db.prepare('DELETE FROM users WHERE id = ?').run(user.id);
+      demoUserIds.push(user.id);
     }
   }
+
+  if (demoUserIds.length === 0) {
+    console.log('   No existing demo data found.');
+    return;
+  }
+
+  // Delete all related data for demo users (in order to respect foreign key constraints)
+  const userIdPlaceholders = demoUserIds.map(() => '?').join(',');
+  
+  // Delete in order to respect foreign key constraints
+  db.prepare(`DELETE FROM risk_alerts WHERE user_id IN (${userIdPlaceholders})`).run(...demoUserIds);
+  db.prepare(`DELETE FROM risk_profile_history WHERE user_id IN (${userIdPlaceholders})`).run(...demoUserIds);
+  db.prepare(`DELETE FROM risk_profiles WHERE user_id IN (${userIdPlaceholders})`).run(...demoUserIds);
+  db.prepare(`DELETE FROM financial_data WHERE user_id IN (${userIdPlaceholders})`).run(...demoUserIds);
+  db.prepare(`DELETE FROM applications WHERE user_id IN (${userIdPlaceholders})`).run(...demoUserIds);
+  db.prepare(`DELETE FROM product_matches WHERE user_id IN (${userIdPlaceholders})`).run(...demoUserIds);
+  db.prepare(`DELETE FROM risk_improvement_goals WHERE user_id IN (${userIdPlaceholders})`).run(...demoUserIds);
+  db.prepare(`DELETE FROM client_profiles WHERE user_id IN (${userIdPlaceholders})`).run(...demoUserIds);
+  
+  // Delete products created by demo banks
+  const demoBankIds: string[] = [];
+  for (const email of demoEmails.slice(3)) { // Bank emails start from index 3
+    const user = db.prepare('SELECT id FROM users WHERE email = ?').get(email) as any;
+    if (user) {
+      const bankProfile = db.prepare('SELECT id FROM bank_profiles WHERE user_id = ?').get(user.id) as any;
+      if (bankProfile) {
+        demoBankIds.push(bankProfile.id);
+      }
+    }
+  }
+  
+  if (demoBankIds.length > 0) {
+    const bankIdPlaceholders = demoBankIds.map(() => '?').join(',');
+    db.prepare(`DELETE FROM product_matches WHERE product_id IN (SELECT id FROM products WHERE bank_id IN (${bankIdPlaceholders}))`).run(...demoBankIds);
+    db.prepare(`DELETE FROM applications WHERE bank_id IN (${bankIdPlaceholders})`).run(...demoBankIds);
+    db.prepare(`DELETE FROM products WHERE bank_id IN (${bankIdPlaceholders})`).run(...demoBankIds);
+    db.prepare(`DELETE FROM bank_profiles WHERE id IN (${bankIdPlaceholders})`).run(...demoBankIds);
+  }
+  
+  // Finally, delete the users
+  db.prepare(`DELETE FROM users WHERE id IN (${userIdPlaceholders})`).run(...demoUserIds);
+  
+  console.log(`   Cleared demo data for ${demoUserIds.length} users and ${demoBankIds.length} banks.`);
 }
 

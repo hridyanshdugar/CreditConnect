@@ -240,13 +240,21 @@ export function initDatabase() {
 initDatabase();
 
 // Conditionally seed demo data if enabled
-if (process.env.SEED_DEMO_DATA === 'true') {
+// This runs on every server start/deployment when SEED_DEMO_DATA=true
+// In development mode, it always runs unless explicitly disabled
+const shouldSeedDemo = process.env.SEED_DEMO_DATA === 'true' || 
+                      (process.env.NODE_ENV === 'development' && process.env.SEED_DEMO_DATA !== 'false');
+
+if (shouldSeedDemo) {
   // Use dynamic import to avoid circular dependencies and ensure async execution
   import('./demo-data')
     .then(({ seedDemoData }) => {
-      seedDemoData().catch((error) => {
-        console.error('Error seeding demo data:', error);
-      });
+      // Small delay to ensure database is fully initialized
+      setTimeout(() => {
+        seedDemoData().catch((error) => {
+          console.error('Error seeding demo data:', error);
+        });
+      }, 100);
     })
     .catch((error) => {
       // Only log if it's not a missing module error (expected if demo-data.ts doesn't exist)

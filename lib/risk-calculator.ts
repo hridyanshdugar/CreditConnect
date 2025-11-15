@@ -194,22 +194,32 @@ export class HelixRiskCalculator {
     let incomeScore = 50; // Default neutral
 
     if (userData.employmentDuration !== undefined) {
-      const employmentScore = Math.min(100, (userData.employmentDuration / 24) * 100);
-      incomeScore += (employmentScore - 50) * 0.3;
+      // Longer employment = lower risk = lower score
+      // 24+ months = 0 (best), 0 months = 100 (worst)
+      const employmentMonths = userData.employmentDuration;
+      if (employmentMonths >= 24) {
+        incomeScore = Math.max(0, incomeScore - 30); // Reduce score for stable employment
+      } else {
+        incomeScore = incomeScore + (24 - employmentMonths) / 24 * 30; // Add risk for short employment
+      }
       factors.push(`Employment duration: ${userData.employmentDuration} months`);
     }
 
     if (userData.monthlyIncomeVariance !== undefined) {
-      const variancePenalty = Math.min(50, userData.monthlyIncomeVariance * 10);
-      incomeScore -= variancePenalty * 0.2;
+      // Higher variance = higher risk = higher score
+      const variancePenalty = Math.min(30, userData.monthlyIncomeVariance * 10);
+      incomeScore += variancePenalty * 0.3;
       factors.push(`Income variance: ${userData.monthlyIncomeVariance.toFixed(2)}%`);
     }
 
     if (userData.multipleIncomeStreams !== undefined) {
-      incomeScore += Math.min(20, userData.multipleIncomeStreams * 5);
+      // More income streams = lower risk = lower score
+      const streamsBonus = Math.min(20, userData.multipleIncomeStreams * 5);
+      incomeScore = Math.max(0, incomeScore - streamsBonus);
       factors.push(`Multiple income streams: ${userData.multipleIncomeStreams}`);
     }
 
+    incomeScore = Math.max(0, Math.min(100, incomeScore));
     score += incomeScore * incomeConsistencyWeight;
 
     // Cash Flow Health (35% weight)
@@ -218,25 +228,43 @@ export class HelixRiskCalculator {
 
     if (userData.averageMonthlyBalance !== undefined && userData.monthlyIncome) {
       const balanceRatio = userData.averageMonthlyBalance / userData.monthlyIncome;
-      cashFlowScore = Math.min(100, balanceRatio * 200);
+      // Higher balance ratio = lower risk = lower score
+      // Balance ratio of 0 = 100 (worst), ratio of 2+ = 0 (best)
+      if (balanceRatio >= 2) {
+        cashFlowScore = 0; // Excellent - 2+ months of income in balance
+      } else if (balanceRatio >= 1) {
+        cashFlowScore = 25 - (balanceRatio - 1) * 25; // Good - 1-2 months
+      } else if (balanceRatio >= 0.5) {
+        cashFlowScore = 50 - (balanceRatio - 0.5) * 50; // Fair - 0.5-1 months
+      } else {
+        cashFlowScore = 50 + (0.5 - balanceRatio) * 100; // Poor - less than 0.5 months
+      }
+      cashFlowScore = Math.max(0, Math.min(100, cashFlowScore));
       factors.push(`Average balance ratio: ${balanceRatio.toFixed(2)}`);
     }
 
     if (userData.overdraftFrequency !== undefined) {
-      cashFlowScore -= Math.min(30, userData.overdraftFrequency * 5);
+      cashFlowScore += Math.min(30, userData.overdraftFrequency * 5); // Add risk for overdrafts
       factors.push(`Overdraft frequency: ${userData.overdraftFrequency}`);
     }
 
     if (userData.savingsRate !== undefined) {
-      cashFlowScore += Math.min(30, userData.savingsRate * 2);
-      factors.push(`Savings rate: ${userData.savingsRate}%`);
+      // Higher savings rate = lower risk = lower score
+      // Savings rate is 0-1 (0% to 100%)
+      const savingsPenalty = Math.min(30, (1 - userData.savingsRate) * 30);
+      cashFlowScore = Math.max(0, cashFlowScore - savingsPenalty);
+      factors.push(`Savings rate: ${(userData.savingsRate * 100).toFixed(1)}%`);
     }
 
     if (userData.emergencyFundCoverage !== undefined) {
-      cashFlowScore += Math.min(20, userData.emergencyFundCoverage * 4);
+      // Higher emergency fund = lower risk = lower score
+      // 6+ months = 0 penalty, 0 months = 20 penalty
+      const emergencyPenalty = Math.max(0, 20 - (userData.emergencyFundCoverage / 6) * 20);
+      cashFlowScore = Math.max(0, cashFlowScore - emergencyPenalty);
       factors.push(`Emergency fund: ${userData.emergencyFundCoverage} months`);
     }
 
+    cashFlowScore = Math.max(0, Math.min(100, cashFlowScore));
     score += cashFlowScore * cashFlowWeight;
 
     // Debt Management (25% weight)
@@ -244,26 +272,38 @@ export class HelixRiskCalculator {
     let debtScore = 50;
 
     if (userData.debtToIncomeRatio !== undefined) {
+      // Lower DTI = lower risk = lower score
+      // DTI <= 0.36 (36%) = excellent (0-25 score)
+      // DTI 0.36-0.43 = good (25-50 score)
+      // DTI > 0.43 = poor (50-100 score)
       if (userData.debtToIncomeRatio <= 0.36) {
-        debtScore = 100 - userData.debtToIncomeRatio * 100;
+        debtScore = userData.debtToIncomeRatio / 0.36 * 25; // 0-25 range
       } else if (userData.debtToIncomeRatio <= 0.43) {
-        debtScore = 70 - (userData.debtToIncomeRatio - 0.36) * 500;
+        debtScore = 25 + ((userData.debtToIncomeRatio - 0.36) / 0.07) * 25; // 25-50 range
       } else {
-        debtScore = Math.max(0, 50 - (userData.debtToIncomeRatio - 0.43) * 500);
+        debtScore = 50 + Math.min(50, ((userData.debtToIncomeRatio - 0.43) / 0.57) * 50); // 50-100 range
       }
       factors.push(`Debt-to-income ratio: ${(userData.debtToIncomeRatio * 100).toFixed(1)}%`);
     }
 
     if (userData.paymentTimeliness !== undefined) {
-      debtScore = (debtScore + userData.paymentTimeliness) / 2;
+      // Higher timeliness = lower risk = lower score
+      // Timeliness is 0-100, where 100 = perfect (should give 0 score)
+      // Average the debt score with the inverse of timeliness
+      const timelinessScore = 100 - userData.paymentTimeliness; // Invert: 100% timeliness = 0 score
+      debtScore = (debtScore + timelinessScore) / 2;
       factors.push(`Payment timeliness: ${userData.paymentTimeliness}%`);
     }
 
     if (userData.creditUtilization !== undefined) {
+      // Lower utilization = lower risk = lower score
+      // Utilization > 30% adds penalty
       const utilizationPenalty = Math.max(0, (userData.creditUtilization - 30) * 0.5);
-      debtScore -= utilizationPenalty;
+      debtScore += utilizationPenalty;
       factors.push(`Credit utilization: ${userData.creditUtilization}%`);
     }
+    
+    debtScore = Math.max(0, Math.min(100, debtScore));
 
     score += debtScore * debtWeight;
 
