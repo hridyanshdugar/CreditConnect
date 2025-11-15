@@ -75,7 +75,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <AppNavbar />
       <main className="container mx-auto px-4 py-16 flex justify-center">
         <Card className="w-full max-w-md">

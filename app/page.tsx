@@ -23,7 +23,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <AppNavbar user={user} />
       <main className="container mx-auto px-4 py-16">
         <div className="text-center mb-16">
