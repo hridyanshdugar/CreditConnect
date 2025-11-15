@@ -177,13 +177,13 @@ export default function FileUpload({ userId, onUploadComplete }: FileUploadProps
             }}
             className="flex-1"
           >
-            <SelectItem key="bank_statement" value="bank_statement">
+            <SelectItem key="bank_statement">
               Bank Statement
             </SelectItem>
-            <SelectItem key="pay_stub" value="pay_stub">
+            <SelectItem key="pay_stub">
               Pay Stub
             </SelectItem>
-            <SelectItem key="tax_return" value="tax_return">
+            <SelectItem key="tax_return">
               Tax Return
             </SelectItem>
           </Select>
