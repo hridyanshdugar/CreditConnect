@@ -344,9 +344,10 @@ export default function RiskProfilePage() {
 
             {/* Raw Data Metrics Section */}
             {riskProfile && riskProfile.userData && (
-              <Card>
+              <Card className="shadow-lg">
                 <CardHeader>
                   <h2 className="text-xl font-semibold">Detailed Risk Assessment Data</h2>
+                  <p className="text-sm text-default-500 mt-1">Comprehensive breakdown of all risk factors across all dimensions</p>
                 </CardHeader>
                 <CardBody className="space-y-6">
                   {/* Financial Stability Metrics */}
@@ -362,7 +363,7 @@ export default function RiskProfilePage() {
                       {riskProfile.userData.monthlyIncomeVariance !== undefined && (
                         <div className="bg-default-50 p-3 rounded-lg">
                           <div className="text-xs text-default-500">Income Variance</div>
-                          <div className="text-lg font-semibold">{riskProfile.userData.monthlyIncomeVariance.toFixed(1)}%</div>
+                          <div className="text-lg font-semibold">{(riskProfile.userData.monthlyIncomeVariance * 100).toFixed(1)}%</div>
                         </div>
                       )}
                       {riskProfile.userData.employmentDuration !== undefined && (
@@ -392,7 +393,7 @@ export default function RiskProfilePage() {
                       {riskProfile.userData.savingsRate !== undefined && (
                         <div className="bg-default-50 p-3 rounded-lg">
                           <div className="text-xs text-default-500">Savings Rate</div>
-                          <div className="text-lg font-semibold">{riskProfile.userData.savingsRate.toFixed(1)}%</div>
+                          <div className="text-lg font-semibold">{(riskProfile.userData.savingsRate * 100).toFixed(1)}%</div>
                         </div>
                       )}
                       {riskProfile.userData.emergencyFundCoverage !== undefined && (
@@ -404,7 +405,7 @@ export default function RiskProfilePage() {
                       {riskProfile.userData.debtToIncomeRatio !== undefined && (
                         <div className="bg-default-50 p-3 rounded-lg">
                           <div className="text-xs text-default-500">Debt-to-Income Ratio</div>
-                          <div className="text-lg font-semibold">{riskProfile.userData.debtToIncomeRatio.toFixed(1)}%</div>
+                          <div className="text-lg font-semibold">{(riskProfile.userData.debtToIncomeRatio * 100).toFixed(1)}%</div>
                         </div>
                       )}
                       {riskProfile.userData.paymentTimeliness !== undefined && (
@@ -437,7 +438,7 @@ export default function RiskProfilePage() {
                       {riskProfile.userData.discretionarySpendingRatio !== undefined && (
                         <div className="bg-default-50 p-3 rounded-lg">
                           <div className="text-xs text-default-500">Discretionary Spending</div>
-                          <div className="text-lg font-semibold">{riskProfile.userData.discretionarySpendingRatio.toFixed(1)}%</div>
+                          <div className="text-lg font-semibold">{(riskProfile.userData.discretionarySpendingRatio * 100).toFixed(1)}%</div>
                         </div>
                       )}
                       {riskProfile.userData.gamblingActivity !== undefined && (
