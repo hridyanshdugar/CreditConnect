@@ -74,7 +74,7 @@ async function createDemoUsers() {
   // Always create fresh demo users (clearDemoData already removed old ones)
   console.log('   Creating demo users...');
 
-  // Create 3 client users with different profiles
+  // Create 3 client users with different profiles - more realistic scenarios
   const clientData = [
     {
       email: 'prime@demo.com',
@@ -82,17 +82,22 @@ async function createDemoUsers() {
       lastName: 'Chen',
       profile: {
         monthlyIncome: 8500,
-        employmentDuration: 72,
-        debtToIncomeRatio: 0.22,
+        employmentDuration: 72, // 6 years at current job
+        debtToIncomeRatio: 0.22, // $1,870 monthly debt payments / $8,500 income
         paymentTimeliness: 98,
         averageMonthlyBalance: 18000,
-        savingsRate: 0.25,
-        emergencyFundCoverage: 8,
+        savingsRate: 0.25, // Saves 25% of income
+        emergencyFundCoverage: 8, // 8 months of expenses saved
         propertyOwnership: true,
         vehicleOwnership: true,
-        investmentAccounts: 3,
-        educationLevel: 90,
-        residentialStability: 60,
+        investmentAccounts: 3, // RRSP, TFSA, Investment account
+        educationLevel: 90, // University degree
+        residentialStability: 60, // 5 years at current address
+        billPaymentConsistency: 98,
+        rentPaymentHistory: 100, // Owns property, no rent
+        utilityPaymentPatterns: 98,
+        creditUtilization: 12, // Low utilization
+        multipleIncomeStreams: 1,
       },
     },
     {
@@ -101,17 +106,22 @@ async function createDemoUsers() {
       lastName: 'Rodriguez',
       profile: {
         monthlyIncome: 5200,
-        employmentDuration: 24,
-        debtToIncomeRatio: 0.38,
+        employmentDuration: 24, // 2 years at current job
+        debtToIncomeRatio: 0.38, // $1,976 monthly debt payments / $5,200 income
         paymentTimeliness: 85,
         averageMonthlyBalance: 3500,
-        savingsRate: 0.12,
-        emergencyFundCoverage: 3,
+        savingsRate: 0.12, // Saves 12% of income
+        emergencyFundCoverage: 3, // 3 months of expenses saved
         propertyOwnership: false,
         vehicleOwnership: true,
-        investmentAccounts: 1,
-        educationLevel: 70,
-        residentialStability: 18,
+        investmentAccounts: 1, // Just a TFSA
+        educationLevel: 70, // Some college/trade school
+        residentialStability: 18, // 1.5 years at current address
+        billPaymentConsistency: 85,
+        rentPaymentHistory: 88, // Rents, mostly on time
+        utilityPaymentPatterns: 82,
+        creditUtilization: 38, // Moderate utilization
+        multipleIncomeStreams: 1,
       },
     },
     {
@@ -120,17 +130,22 @@ async function createDemoUsers() {
       lastName: 'Thompson',
       profile: {
         monthlyIncome: 3200,
-        employmentDuration: 8,
-        debtToIncomeRatio: 0.58,
+        employmentDuration: 8, // 8 months at current job
+        debtToIncomeRatio: 0.58, // $1,856 monthly debt payments / $3,200 income
         paymentTimeliness: 68,
         averageMonthlyBalance: 800,
-        savingsRate: 0.03,
-        emergencyFundCoverage: 0.5,
+        savingsRate: 0.03, // Saves only 3% of income
+        emergencyFundCoverage: 0.5, // Less than 1 month saved
         propertyOwnership: false,
         vehicleOwnership: false,
         investmentAccounts: 0,
-        educationLevel: 50,
-        residentialStability: 6,
+        educationLevel: 50, // High school diploma
+        residentialStability: 6, // 6 months at current address
+        billPaymentConsistency: 65,
+        rentPaymentHistory: 70, // Rents, sometimes late
+        utilityPaymentPatterns: 60,
+        creditUtilization: 75, // High utilization
+        multipleIncomeStreams: 1,
       },
     },
   ];
@@ -480,11 +495,11 @@ async function createProducts(banks: any[]) {
       maxScore: 40,
       originationFee: 1000,
     },
-    // Additional products for variety
+    // Additional products for variety - Auto Loans
     {
       bankIndex: 0,
       name: 'RBC Auto Loan',
-      description: 'Competitive auto financing rates',
+      description: 'Competitive auto financing rates for new and used vehicles',
       type: 'auto_loan' as const,
       baseRate: 6.99,
       minAmount: 10000,
@@ -498,13 +513,339 @@ async function createProducts(banks: any[]) {
     {
       bankIndex: 1,
       name: 'TD Auto Loan',
-      description: 'Flexible auto financing options',
+      description: 'Flexible auto financing options with competitive rates',
       type: 'auto_loan' as const,
       baseRate: 7.49,
       minAmount: 10000,
       maxAmount: 100000,
       minTerm: 24,
       maxTerm: 84,
+      minScore: 0,
+      maxScore: 50,
+      originationFee: 0,
+    },
+    {
+      bankIndex: 2,
+      name: 'Scotiabank Auto Loan',
+      description: 'Auto financing with flexible payment options',
+      type: 'auto_loan' as const,
+      baseRate: 7.99,
+      minAmount: 10000,
+      maxAmount: 100000,
+      minTerm: 24,
+      maxTerm: 84,
+      minScore: 0,
+      maxScore: 50,
+      originationFee: 0,
+    },
+    {
+      bankIndex: 3,
+      name: 'BMO Auto Loan',
+      description: 'Competitive rates for vehicle financing',
+      type: 'auto_loan' as const,
+      baseRate: 7.29,
+      minAmount: 10000,
+      maxAmount: 100000,
+      minTerm: 24,
+      maxTerm: 84,
+      minScore: 0,
+      maxScore: 50,
+      originationFee: 0,
+    },
+    {
+      bankIndex: 4,
+      name: 'CIBC Auto Loan',
+      description: 'Simple and affordable auto financing',
+      type: 'auto_loan' as const,
+      baseRate: 7.19,
+      minAmount: 10000,
+      maxAmount: 100000,
+      minTerm: 24,
+      maxTerm: 84,
+      minScore: 0,
+      maxScore: 50,
+      originationFee: 0,
+    },
+    // Student Loans
+    {
+      bankIndex: 0,
+      name: 'RBC Student Line of Credit',
+      description: 'Flexible funding for post-secondary education',
+      type: 'student_loan' as const,
+      baseRate: 4.99,
+      minAmount: 5000,
+      maxAmount: 150000,
+      minTerm: 1,
+      maxTerm: 1,
+      minScore: 0,
+      maxScore: 45,
+      originationFee: 0,
+    },
+    {
+      bankIndex: 1,
+      name: 'TD Student Line of Credit',
+      description: 'Affordable financing for students',
+      type: 'student_loan' as const,
+      baseRate: 5.25,
+      minAmount: 5000,
+      maxAmount: 150000,
+      minTerm: 1,
+      maxTerm: 1,
+      minScore: 0,
+      maxScore: 45,
+      originationFee: 0,
+    },
+    {
+      bankIndex: 2,
+      name: 'Scotiabank Student Line of Credit',
+      description: 'Support your education with flexible credit',
+      type: 'student_loan' as const,
+      baseRate: 5.49,
+      minAmount: 5000,
+      maxAmount: 150000,
+      minTerm: 1,
+      maxTerm: 1,
+      minScore: 0,
+      maxScore: 45,
+      originationFee: 0,
+    },
+    {
+      bankIndex: 3,
+      name: 'BMO Student Line of Credit',
+      description: 'Invest in your future with student financing',
+      type: 'student_loan' as const,
+      baseRate: 5.19,
+      minAmount: 5000,
+      maxAmount: 150000,
+      minTerm: 1,
+      maxTerm: 1,
+      minScore: 0,
+      maxScore: 45,
+      originationFee: 0,
+    },
+    {
+      bankIndex: 4,
+      name: 'CIBC Student Line of Credit',
+      description: 'Flexible credit for education expenses',
+      type: 'student_loan' as const,
+      baseRate: 5.39,
+      minAmount: 5000,
+      maxAmount: 150000,
+      minTerm: 1,
+      maxTerm: 1,
+      minScore: 0,
+      maxScore: 45,
+      originationFee: 0,
+    },
+    // Home Equity Lines of Credit
+    {
+      bankIndex: 0,
+      name: 'RBC Homeline Plan',
+      description: 'Access your home equity with flexible repayment',
+      type: 'home_equity' as const,
+      baseRate: 6.49,
+      minAmount: 25000,
+      maxAmount: 500000,
+      minTerm: 1,
+      maxTerm: 1,
+      minScore: 0,
+      maxScore: 40,
+      originationFee: 500,
+    },
+    {
+      bankIndex: 1,
+      name: 'TD Home Equity FlexLine',
+      description: 'Flexible home equity line of credit',
+      type: 'home_equity' as const,
+      baseRate: 6.59,
+      minAmount: 25000,
+      maxAmount: 500000,
+      minTerm: 1,
+      maxTerm: 1,
+      minScore: 0,
+      maxScore: 40,
+      originationFee: 500,
+    },
+    {
+      bankIndex: 2,
+      name: 'Scotiabank Home Equity Line of Credit',
+      description: 'Unlock your home equity for major expenses',
+      type: 'home_equity' as const,
+      baseRate: 6.69,
+      minAmount: 25000,
+      maxAmount: 500000,
+      minTerm: 1,
+      maxTerm: 1,
+      minScore: 0,
+      maxScore: 40,
+      originationFee: 500,
+    },
+    {
+      bankIndex: 3,
+      name: 'BMO Homeowner ReadiLine',
+      description: 'Flexible home equity credit line',
+      type: 'home_equity' as const,
+      baseRate: 6.49,
+      minAmount: 25000,
+      maxAmount: 500000,
+      minTerm: 1,
+      maxTerm: 1,
+      minScore: 0,
+      maxScore: 40,
+      originationFee: 500,
+    },
+    {
+      bankIndex: 4,
+      name: 'CIBC Home Power Plan',
+      description: 'Access your home equity with competitive rates',
+      type: 'home_equity' as const,
+      baseRate: 6.59,
+      minAmount: 25000,
+      maxAmount: 500000,
+      minTerm: 1,
+      maxTerm: 1,
+      minScore: 0,
+      maxScore: 40,
+      originationFee: 500,
+    },
+    // Business Loans
+    {
+      bankIndex: 0,
+      name: 'RBC Business Loan',
+      description: 'Financing for small and medium businesses',
+      type: 'business_loan' as const,
+      baseRate: 7.99,
+      minAmount: 25000,
+      maxAmount: 500000,
+      minTerm: 12,
+      maxTerm: 60,
+      minScore: 0,
+      maxScore: 45,
+      originationFee: 1000,
+    },
+    {
+      bankIndex: 1,
+      name: 'TD Business Loan',
+      description: 'Flexible financing solutions for businesses',
+      type: 'business_loan' as const,
+      baseRate: 8.49,
+      minAmount: 25000,
+      maxAmount: 500000,
+      minTerm: 12,
+      maxTerm: 60,
+      minScore: 0,
+      maxScore: 45,
+      originationFee: 1000,
+    },
+    {
+      bankIndex: 2,
+      name: 'Scotiabank Business Loan',
+      description: 'Support your business growth with competitive rates',
+      type: 'business_loan' as const,
+      baseRate: 8.29,
+      minAmount: 25000,
+      maxAmount: 500000,
+      minTerm: 12,
+      maxTerm: 60,
+      minScore: 0,
+      maxScore: 45,
+      originationFee: 1000,
+    },
+    {
+      bankIndex: 3,
+      name: 'BMO Business Loan',
+      description: 'Tailored financing for your business needs',
+      type: 'business_loan' as const,
+      baseRate: 8.19,
+      minAmount: 25000,
+      maxAmount: 500000,
+      minTerm: 12,
+      maxTerm: 60,
+      minScore: 0,
+      maxScore: 45,
+      originationFee: 1000,
+    },
+    {
+      bankIndex: 4,
+      name: 'CIBC Business Loan',
+      description: 'Flexible business financing options',
+      type: 'business_loan' as const,
+      baseRate: 8.39,
+      minAmount: 25000,
+      maxAmount: 500000,
+      minTerm: 12,
+      maxTerm: 60,
+      minScore: 0,
+      maxScore: 45,
+      originationFee: 1000,
+    },
+    // Additional Credit Cards (more variety)
+    {
+      bankIndex: 0,
+      name: 'RBC Cash Back Mastercard',
+      description: 'Earn cash back on everyday purchases',
+      type: 'credit_line' as const,
+      baseRate: 19.99,
+      minAmount: 1000,
+      maxAmount: 25000,
+      minTerm: 1,
+      maxTerm: 1,
+      minScore: 0,
+      maxScore: 50,
+      originationFee: 0,
+    },
+    {
+      bankIndex: 1,
+      name: 'TD Cash Back Visa',
+      description: 'Simple cash back rewards on all purchases',
+      type: 'credit_line' as const,
+      baseRate: 19.99,
+      minAmount: 1000,
+      maxAmount: 25000,
+      minTerm: 1,
+      maxTerm: 1,
+      minScore: 0,
+      maxScore: 50,
+      originationFee: 0,
+    },
+    {
+      bankIndex: 2,
+      name: 'Scotiabank Scene Visa',
+      description: 'Earn Scene points for movies and entertainment',
+      type: 'credit_line' as const,
+      baseRate: 19.99,
+      minAmount: 1000,
+      maxAmount: 20000,
+      minTerm: 1,
+      maxTerm: 1,
+      minScore: 0,
+      maxScore: 50,
+      originationFee: 0,
+    },
+    {
+      bankIndex: 3,
+      name: 'BMO CashBack Mastercard',
+      description: 'Earn cash back on every purchase',
+      type: 'credit_line' as const,
+      baseRate: 19.99,
+      minAmount: 1000,
+      maxAmount: 25000,
+      minTerm: 1,
+      maxTerm: 1,
+      minScore: 0,
+      maxScore: 50,
+      originationFee: 0,
+    },
+    {
+      bankIndex: 4,
+      name: 'CIBC Dividend Visa',
+      description: 'Earn dividends on everyday spending',
+      type: 'credit_line' as const,
+      baseRate: 19.99,
+      minAmount: 1000,
+      maxAmount: 25000,
+      minTerm: 1,
+      maxTerm: 1,
       minScore: 0,
       maxScore: 50,
       originationFee: 0,
@@ -696,75 +1037,157 @@ async function createSampleFinancialDocuments(clients: any[]) {
 
     // Prime customer - excellent credit profile
     if (client.email === 'prime@demo.com') {
-      // Credit card statements (2 cards, low utilization)
+      // 1 Primary Credit Card (opened 4 years ago) - low utilization
+      const primaryCardOpened = new Date(now);
+      primaryCardOpened.setFullYear(primaryCardOpened.getFullYear() - 4);
+      
+      // Most recent statement (current month)
+      const recentDate = new Date(now);
+      const monthYear = `${recentDate.getFullYear()}-${String(recentDate.getMonth() + 1).padStart(2, '0')}`;
+      
+      db.prepare(`
+        INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        randomUUID(),
+        userId,
+        'credit_card_statement',
+        'RBC Visa Infinite Statement.pdf',
+        JSON.stringify({ fileName: 'rbc_visa_statement.pdf', accountNumber: '****1234' }),
+        JSON.stringify({
+          creditCardBalance: 1800, // Low balance
+          creditLimit: 15000,
+          creditUtilization: 12,
+          minimumPayment: 50,
+        }),
+        monthYear,
+        recentDate.toISOString()
+      );
+
+      // 1 Secondary Credit Card (opened 2 years ago) - very low utilization
+      const secondaryCardOpened = new Date(now);
+      secondaryCardOpened.setFullYear(secondaryCardOpened.getFullYear() - 2);
+      
+      db.prepare(`
+        INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        randomUUID(),
+        userId,
+        'credit_card_statement',
+        'TD Aeroplan Visa Statement.pdf',
+        JSON.stringify({ fileName: 'td_aeroplan_statement.pdf', accountNumber: '****5678' }),
+        JSON.stringify({
+          creditCardBalance: 700, // Very low balance
+          creditLimit: 12000,
+          creditUtilization: 5.8,
+          minimumPayment: 25,
+        }),
+        monthYear,
+        secondaryCardOpened.toISOString()
+      );
+
+      // Auto Loan (opened 3 years ago, 5-year term)
+      const loanDate = new Date(now);
+      loanDate.setFullYear(loanDate.getFullYear() - 3);
+      db.prepare(`
+        INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        randomUUID(),
+        userId,
+        'loan_statement',
+        'TD Auto Loan Statement.pdf',
+        JSON.stringify({ fileName: 'td_auto_loan.pdf', accountNumber: 'AUTO-2021-001' }),
+        JSON.stringify({
+          loanBalance: 12000,
+          loanMonthlyPayment: 350,
+          loanType: 'auto',
+          loanInterestRate: 4.5,
+          originalAmount: 35000,
+        }),
+        `${loanDate.getFullYear()}-${String(loanDate.getMonth() + 1).padStart(2, '0')}`,
+        loanDate.toISOString()
+      );
+
+      // Pay Stubs (last 6 months - bi-weekly)
       for (let i = 0; i < 6; i++) {
         const date = new Date(now);
         date.setMonth(date.getMonth() - i);
         const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
         
-        const dataId = randomUUID();
         db.prepare(`
           INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
-          dataId,
+          randomUUID(),
           userId,
-          'credit_card_statement',
-          `Credit Card Statement ${monthYear}.pdf`,
-          JSON.stringify({ fileName: `credit_card_${monthYear}.pdf` }),
+          'pay_stub',
+          `Pay Stub ${monthYear}.pdf`,
+          JSON.stringify({ fileName: `paystub_${monthYear}.pdf` }),
           JSON.stringify({
-            creditCardBalance: 2500,
-            creditLimit: 15000,
-            creditUtilization: 16.7,
-            minimumPayment: 75,
+            monthlyIncome: 8500,
+            employer: 'Tech Solutions Inc.',
+            payPeriod: { start: date.toISOString(), end: new Date(date.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString() },
           }),
           monthYear,
           date.toISOString()
         );
       }
 
-      // Loan statement (auto loan)
-      const loanDataId = randomUUID();
-      const loanDate = new Date(now);
-      loanDate.setFullYear(loanDate.getFullYear() - 3); // 3 years ago
-      db.prepare(`
-        INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `).run(
-        loanDataId,
-        userId,
-        'loan_statement',
-        'Auto Loan Statement.pdf',
-        JSON.stringify({ fileName: 'auto_loan.pdf' }),
-        JSON.stringify({
-          loanBalance: 12000,
-          loanMonthlyPayment: 350,
-          loanType: 'auto',
-          loanInterestRate: 4.5,
-        }),
-        `${loanDate.getFullYear()}-${String(loanDate.getMonth() + 1).padStart(2, '0')}`,
-        loanDate.toISOString()
-      );
-
-      // Bills (all paid on time)
-      for (let i = 0; i < 12; i++) {
+      // Bank Statements (last 3 months)
+      for (let i = 0; i < 3; i++) {
         const date = new Date(now);
         date.setMonth(date.getMonth() - i);
         const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
         
-        const billDataId = randomUUID();
         db.prepare(`
           INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
-          billDataId,
+          randomUUID(),
+          userId,
+          'bank_statement',
+          `Bank Statement ${monthYear}.pdf`,
+          JSON.stringify({ fileName: `bank_statement_${monthYear}.pdf` }),
+          JSON.stringify({
+            averageMonthlyBalance: 18000,
+            overdraftFrequency: 0,
+            savingsRate: 0.25,
+            paymentTimeliness: 98,
+            transactions: [],
+          }),
+          monthYear,
+          date.toISOString()
+        );
+      }
+
+      // Bills - variety of types, all paid on time
+      const billTypes = [
+        { type: 'utility', amount: 180, provider: 'Hydro One' },
+        { type: 'utility', amount: 65, provider: 'Enbridge Gas' },
+        { type: 'utility', amount: 95, provider: 'Bell Internet' },
+        { type: 'insurance', amount: 220, provider: 'State Farm' },
+      ];
+      
+      for (let i = 0; i < 12; i++) {
+        const date = new Date(now);
+        date.setMonth(date.getMonth() - i);
+        const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        const billType = billTypes[i % billTypes.length];
+        
+        db.prepare(`
+          INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+          randomUUID(),
           userId,
           'bill',
-          `Utility Bill ${monthYear}.pdf`,
-          JSON.stringify({ fileName: `utility_${monthYear}.pdf` }),
+          `${billType.provider} Bill ${monthYear}.pdf`,
+          JSON.stringify({ fileName: `${billType.type}_${monthYear}.pdf` }),
           JSON.stringify({
-            billAmount: 150,
-            billType: 'utility',
+            billAmount: billType.amount,
+            billType: billType.type,
             billDueDate: date.toISOString(),
             billPaymentStatus: 'paid',
             paymentTimeliness: 100,
@@ -777,56 +1200,110 @@ async function createSampleFinancialDocuments(clients: any[]) {
 
     // Near-prime customer - good but not perfect
     if (client.email === 'nearprime@demo.com') {
-      // Credit card (moderate utilization)
-      for (let i = 0; i < 6; i++) {
+      // 1 Credit Card (opened 18 months ago) - moderate utilization
+      const cardOpened = new Date(now);
+      cardOpened.setMonth(cardOpened.getMonth() - 18);
+      
+      const recentDate = new Date(now);
+      const monthYear = `${recentDate.getFullYear()}-${String(recentDate.getMonth() + 1).padStart(2, '0')}`;
+      
+      db.prepare(`
+        INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        randomUUID(),
+        userId,
+        'credit_card_statement',
+        'Scotiabank Scene Visa Statement.pdf',
+        JSON.stringify({ fileName: 'scotia_scene_statement.pdf', accountNumber: '****9012' }),
+        JSON.stringify({
+          creditCardBalance: 3800,
+          creditLimit: 10000,
+          creditUtilization: 38,
+          minimumPayment: 115,
+        }),
+        monthYear,
+        cardOpened.toISOString()
+      );
+
+      // Auto Loan (opened 2 years ago)
+      const loanDate = new Date(now);
+      loanDate.setFullYear(loanDate.getFullYear() - 2);
+      db.prepare(`
+        INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        randomUUID(),
+        userId,
+        'loan_statement',
+        'BMO Auto Loan Statement.pdf',
+        JSON.stringify({ fileName: 'bmo_auto_loan.pdf', accountNumber: 'AUTO-2022-045' }),
+        JSON.stringify({
+          loanBalance: 18500,
+          loanMonthlyPayment: 420,
+          loanType: 'auto',
+          loanInterestRate: 6.9,
+          originalAmount: 28000,
+        }),
+        `${loanDate.getFullYear()}-${String(loanDate.getMonth() + 1).padStart(2, '0')}`,
+        loanDate.toISOString()
+      );
+
+      // Pay Stubs (last 4 months)
+      for (let i = 0; i < 4; i++) {
         const date = new Date(now);
         date.setMonth(date.getMonth() - i);
         const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
         
-        const dataId = randomUUID();
         db.prepare(`
           INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
-          dataId,
+          randomUUID(),
           userId,
-          'credit_card_statement',
-          `Credit Card Statement ${monthYear}.pdf`,
-          JSON.stringify({ fileName: `credit_card_${monthYear}.pdf` }),
+          'pay_stub',
+          `Pay Stub ${monthYear}.pdf`,
+          JSON.stringify({ fileName: `paystub_${monthYear}.pdf` }),
           JSON.stringify({
-            creditCardBalance: 4200,
-            creditLimit: 10000,
-            creditUtilization: 42,
-            minimumPayment: 125,
+            monthlyIncome: 5200,
+            employer: 'Retail Management Corp',
+            payPeriod: { start: date.toISOString(), end: new Date(date.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString() },
           }),
           monthYear,
           date.toISOString()
         );
       }
 
-      // Bills (mostly on time, some late)
+      // Bills - mostly on time, some late
+      const billTypes = [
+        { type: 'utility', amount: 140, provider: 'Toronto Hydro' },
+        { type: 'utility', amount: 55, provider: 'Enbridge Gas' },
+        { type: 'rent', amount: 1650, provider: 'Property Management Ltd' },
+        { type: 'utility', amount: 75, provider: 'Rogers Internet' },
+      ];
+      
       for (let i = 0; i < 12; i++) {
         const date = new Date(now);
         date.setMonth(date.getMonth() - i);
         const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        const billType = billTypes[i % billTypes.length];
         const isLate = i < 2; // Last 2 months late
         
-        const billDataId = randomUUID();
         db.prepare(`
           INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
-          billDataId,
+          randomUUID(),
           userId,
           'bill',
-          `Utility Bill ${monthYear}.pdf`,
-          JSON.stringify({ fileName: `utility_${monthYear}.pdf` }),
+          `${billType.provider} Bill ${monthYear}.pdf`,
+          JSON.stringify({ fileName: `${billType.type}_${monthYear}.pdf` }),
           JSON.stringify({
-            billAmount: 120,
-            billType: 'utility',
+            billAmount: billType.amount,
+            billType: billType.type,
             billDueDate: date.toISOString(),
             billPaymentStatus: isLate ? 'overdue' : 'paid',
-            paymentTimeliness: isLate ? 70 : 100,
+            paymentTimeliness: isLate ? 75 : 100,
           }),
           monthYear,
           date.toISOString()
@@ -836,57 +1313,111 @@ async function createSampleFinancialDocuments(clients: any[]) {
 
     // Subprime customer - high utilization, late payments
     if (client.email === 'subprime@demo.com') {
-      // Credit card (high utilization)
-      for (let i = 0; i < 6; i++) {
+      // 1 Credit Card (opened 8 months ago) - high utilization
+      const cardOpened = new Date(now);
+      cardOpened.setMonth(cardOpened.getMonth() - 8);
+      
+      const recentDate = new Date(now);
+      const monthYear = `${recentDate.getFullYear()}-${String(recentDate.getMonth() + 1).padStart(2, '0')}`;
+      
+      db.prepare(`
+        INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        randomUUID(),
+        userId,
+        'credit_card_statement',
+        'Capital One Mastercard Statement.pdf',
+        JSON.stringify({ fileName: 'capital_one_statement.pdf', accountNumber: '****3456' }),
+        JSON.stringify({
+          creditCardBalance: 4500,
+          creditLimit: 6000,
+          creditUtilization: 75,
+          minimumPayment: 135,
+        }),
+        monthYear,
+        cardOpened.toISOString()
+      );
+
+      // Personal Loan (opened 6 months ago) - high interest
+      const loanDate = new Date(now);
+      loanDate.setMonth(loanDate.getMonth() - 6);
+      db.prepare(`
+        INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        randomUUID(),
+        userId,
+        'loan_statement',
+        'Easy Financial Personal Loan.pdf',
+        JSON.stringify({ fileName: 'easy_financial_loan.pdf', accountNumber: 'PL-2024-089' }),
+        JSON.stringify({
+          loanBalance: 8500,
+          loanMonthlyPayment: 280,
+          loanType: 'personal',
+          loanInterestRate: 29.9,
+          originalAmount: 10000,
+        }),
+        `${loanDate.getFullYear()}-${String(loanDate.getMonth() + 1).padStart(2, '0')}`,
+        loanDate.toISOString()
+      );
+
+      // Pay Stubs (last 3 months - irregular)
+      for (let i = 0; i < 3; i++) {
         const date = new Date(now);
         date.setMonth(date.getMonth() - i);
         const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
         
-        const dataId = randomUUID();
         db.prepare(`
           INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
-          dataId,
+          randomUUID(),
           userId,
-          'credit_card_statement',
-          `Credit Card Statement ${monthYear}.pdf`,
-          JSON.stringify({ fileName: `credit_card_${monthYear}.pdf` }),
+          'pay_stub',
+          `Pay Stub ${monthYear}.pdf`,
+          JSON.stringify({ fileName: `paystub_${monthYear}.pdf` }),
           JSON.stringify({
-            creditCardBalance: 4800,
-            creditLimit: 6000,
-            creditUtilization: 80,
-            minimumPayment: 150,
+            monthlyIncome: 3200,
+            employer: 'Temp Agency Services',
+            payPeriod: { start: date.toISOString(), end: new Date(date.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString() },
           }),
           monthYear,
           date.toISOString()
         );
       }
 
-      // Bills (many late/missed)
+      // Bills - many late/missed
+      const billTypes = [
+        { type: 'utility', amount: 95, provider: 'Hydro One' },
+        { type: 'rent', amount: 1200, provider: 'Landlord - John Smith' },
+        { type: 'utility', amount: 45, provider: 'Enbridge Gas' },
+        { type: 'utility', amount: 65, provider: 'Bell Internet' },
+      ];
+      
       for (let i = 0; i < 12; i++) {
         const date = new Date(now);
         date.setMonth(date.getMonth() - i);
         const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        const billType = billTypes[i % billTypes.length];
         const isMissed = i < 3; // Last 3 months missed
         const isLate = i >= 3 && i < 6; // 3-6 months ago late
         
-        const billDataId = randomUUID();
         db.prepare(`
           INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
-          billDataId,
+          randomUUID(),
           userId,
           'bill',
-          `Utility Bill ${monthYear}.pdf`,
-          JSON.stringify({ fileName: `utility_${monthYear}.pdf` }),
+          `${billType.provider} Bill ${monthYear}.pdf`,
+          JSON.stringify({ fileName: `${billType.type}_${monthYear}.pdf` }),
           JSON.stringify({
-            billAmount: 100,
-            billType: 'utility',
+            billAmount: billType.amount,
+            billType: billType.type,
             billDueDate: date.toISOString(),
             billPaymentStatus: isMissed ? 'overdue' : isLate ? 'overdue' : 'paid',
-            paymentTimeliness: isMissed ? 30 : isLate ? 60 : 100,
+            paymentTimeliness: isMissed ? 30 : isLate ? 65 : 100,
           }),
           monthYear,
           date.toISOString()
