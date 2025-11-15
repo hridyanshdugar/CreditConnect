@@ -83,8 +83,8 @@ export interface RiskExplanation {
 }
 
 export interface RiskCalculationResult {
-  helixScore: number; // 0-100, lower is better
-  riskCategory: 'prime' | 'near_prime' | 'subprime' | 'deep_subprime' | 'decline';
+  helixGrade: 'A' | 'B' | 'C' | 'D' | 'E' | 'F'; // Letter grade, A is best, F is worst
+  helixScore: number; // 0-100, lower is better (kept for internal calculations)
   dimensionScores: DimensionScores;
   explanation: RiskExplanation;
   confidenceInterval: number;
@@ -92,8 +92,18 @@ export interface RiskCalculationResult {
     highRisk: boolean;
     requiresManualReview: boolean;
     fastTrackEligible: boolean;
-    primeCustomer: boolean;
   };
+}
+
+// Helper function to convert score to grade (exported for use in other files)
+export function scoreToGrade(score: number): 'A' | 'B' | 'C' | 'D' | 'E' | 'F' {
+  // A: 0-20 (best), B: 21-40, C: 41-60, D: 61-80, E: 81-90, F: 91-100 (worst)
+  if (score <= 20) return 'A';
+  if (score <= 40) return 'B';
+  if (score <= 60) return 'C';
+  if (score <= 80) return 'D';
+  if (score <= 90) return 'E';
+  return 'F';
 }
 
 export class HelixRiskCalculator {
@@ -103,14 +113,6 @@ export class HelixRiskCalculator {
     alternative_data: 0.20,
     economic_environment: 0.10,
     fraud_risk: 0.10,
-  };
-
-  private riskThresholds = {
-    prime: { min: 0, max: 25 },
-    near_prime: { min: 26, max: 45 },
-    subprime: { min: 46, max: 65 },
-    deep_subprime: { min: 66, max: 85 },
-    decline: { min: 86, max: 100 },
   };
 
   calculateHelixScore(userData: UserData): RiskCalculationResult {
@@ -146,8 +148,8 @@ export class HelixRiskCalculator {
       fraud: fraudScore.confidence,
     });
 
-    // Get risk category
-    const riskCategory = this.getRiskCategory(weightedScore);
+    // Convert score to grade
+    const helixGrade = this.getHelixGrade(weightedScore);
 
     // Generate explanation
     const explanation = this.generateRiskExplanation(
@@ -159,7 +161,8 @@ export class HelixRiskCalculator {
         alternative: alternativeScore.factors,
         economic_environment: environmentalScore.factors,
         fraud: fraudScore.factors,
-      }
+      },
+      helixGrade
     );
 
     // Determine flags
@@ -167,12 +170,11 @@ export class HelixRiskCalculator {
       highRisk: weightedScore >= 66,
       requiresManualReview: weightedScore >= 45 || fraudScore.score >= 70,
       fastTrackEligible: weightedScore <= 30 && fraudScore.score <= 20,
-      primeCustomer: weightedScore <= 25,
     };
 
     return {
+      helixGrade,
       helixScore: Math.round(weightedScore * 100) / 100,
-      riskCategory,
       dimensionScores,
       explanation,
       confidenceInterval,
@@ -690,18 +692,15 @@ export class HelixRiskCalculator {
     return Math.round(weightedConfidence * 100) / 100;
   }
 
-  private getRiskCategory(score: number): 'prime' | 'near_prime' | 'subprime' | 'deep_subprime' | 'decline' {
-    if (score <= this.riskThresholds.prime.max) return 'prime';
-    if (score <= this.riskThresholds.near_prime.max) return 'near_prime';
-    if (score <= this.riskThresholds.subprime.max) return 'subprime';
-    if (score <= this.riskThresholds.deep_subprime.max) return 'deep_subprime';
-    return 'decline';
+  private getHelixGrade(score: number): 'A' | 'B' | 'C' | 'D' | 'E' | 'F' {
+    return scoreToGrade(score);
   }
 
   private generateRiskExplanation(
     dimensionScores: DimensionScores,
     userData: UserData,
-    factorDetails: Record<string, string[]>
+    factorDetails: Record<string, string[]>,
+    helixGrade: 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
   ): RiskExplanation {
     const explanation: RiskExplanation = {
       summary: '',
@@ -718,7 +717,7 @@ export class HelixRiskCalculator {
 
     // Generate summary
     const overallScore = Object.values(dimensionScores).reduce((a, b) => a + b, 0) / 5;
-    explanation.summary = `Your Helix Score of ${overallScore.toFixed(1)} places you in the ${this.getRiskCategory(overallScore)} category. `;
+    explanation.summary = `Your Helix Grade is ${helixGrade}, based on a risk score of ${overallScore.toFixed(1)}. `;
     
     if (highestRisk[1] > 70) {
       explanation.summary += `Primary concern: ${highestRisk[0]} risk is elevated. `;

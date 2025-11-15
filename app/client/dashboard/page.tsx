@@ -64,15 +64,16 @@ export default function ClientDashboard() {
     return 'danger';
   };
 
-  const getRiskLabel = (category: string) => {
-    const labels: Record<string, string> = {
-      prime: 'Prime',
-      near_prime: 'Near Prime',
-      subprime: 'Subprime',
-      deep_subprime: 'Deep Subprime',
-      decline: 'Decline',
+  const getGradeColor = (grade: string) => {
+    const colors: Record<string, string> = {
+      A: 'success',
+      B: 'primary',
+      C: 'warning',
+      D: 'warning',
+      E: 'danger',
+      F: 'danger',
     };
-    return labels[category] || category;
+    return colors[grade] || 'default';
   };
 
   return (
@@ -85,24 +86,24 @@ export default function ClientDashboard() {
           <div className="grid md:grid-cols-2 gap-6 mb-8">
             <Card>
               <CardHeader>
-                <h2 className="text-xl font-semibold">Helix Risk Score</h2>
+                <h2 className="text-xl font-semibold">Helix Grade</h2>
               </CardHeader>
               <CardBody>
                 <div className="text-center">
-                  <div className="text-6xl font-bold mb-4" style={{ color: `var(--${getRiskColor(riskProfile.helixScore)}-500)` }}>
-                    {riskProfile.helixScore.toFixed(1)}
+                  <div className="text-6xl font-bold mb-4" style={{ color: `var(--${getGradeColor(riskProfile.helixGrade || 'C')}-500)` }}>
+                    {riskProfile.helixGrade || 'N/A'}
                   </div>
-                  <Chip color={getRiskColor(riskProfile.helixScore)} variant="flat" size="lg">
-                    {getRiskLabel(riskProfile.riskCategory)}
+                  <Chip color={getGradeColor(riskProfile.helixGrade || 'C')} variant="flat" size="lg">
+                    Grade {riskProfile.helixGrade || 'N/A'}
                   </Chip>
                   <div className="mt-4">
                     <Progress
                       value={100 - riskProfile.helixScore}
-                      color={getRiskColor(riskProfile.helixScore)}
+                      color={getGradeColor(riskProfile.helixGrade || 'C')}
                       className="max-w-md"
                     />
                     <p className="text-sm text-gray-500 mt-2">
-                      Lower scores indicate lower risk
+                      Risk Score: {riskProfile.helixScore.toFixed(1)}
                     </p>
                   </div>
                 </div>

@@ -232,7 +232,7 @@ async function createRiskProfiles(clients: any[]) {
       profileId,
       client.userId,
       result.helixScore,
-      result.riskCategory,
+      result.helixGrade, // Store grade in risk_category column
       result.dimensionScores.financial,
       client.profile.monthlyIncome ? (client.profile.debtToIncomeRatio || 0) : null,
       result.dimensionScores.behavioral,
@@ -259,6 +259,8 @@ async function createRiskProfiles(clients: any[]) {
       historyDate.setMonth(historyDate.getMonth() - i);
       const historicalScore = result.helixScore + (Math.random() * 5 - 2.5); // Small variation
 
+      // Calculate grade for historical score
+      const historicalGrade = historicalScore <= 20 ? 'A' : historicalScore <= 40 ? 'B' : historicalScore <= 60 ? 'C' : historicalScore <= 80 ? 'D' : historicalScore <= 90 ? 'E' : 'F';
       db.prepare(`
         INSERT INTO risk_profile_history (id, user_id, helix_score, risk_category, dimension_scores, created_at)
         VALUES (?, ?, ?, ?, ?, ?)
@@ -266,7 +268,7 @@ async function createRiskProfiles(clients: any[]) {
         historyId,
         client.userId,
         historicalScore,
-        result.riskCategory,
+        historicalGrade, // Store grade in risk_category column
         JSON.stringify(result.dimensionScores),
         historyDate.toISOString()
       );

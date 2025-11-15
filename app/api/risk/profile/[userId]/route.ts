@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
+import { scoreToGrade } from '@/lib/risk-calculator';
 
 export async function GET(
   request: NextRequest,
@@ -41,10 +42,15 @@ export async function GET(
     const explanation = JSON.parse(profile.explanation || '{}');
     const recommendations = explanation.recommendations || [];
 
+    // Convert score to grade (use stored grade if available, otherwise compute from score)
+    const helixGrade = profile.risk_category && ['A', 'B', 'C', 'D', 'E', 'F'].includes(profile.risk_category)
+      ? profile.risk_category as 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
+      : scoreToGrade(profile.helix_score);
+
     return NextResponse.json({
       currentProfile: {
+        helixGrade,
         helixScore: profile.helix_score,
-        riskCategory: profile.risk_category,
         dimensionScores: {
           financial: profile.financial_stability_score,
           behavioral: profile.behavioral_risk_score,
@@ -59,12 +65,17 @@ export async function GET(
         createdAt: profile.created_at,
         updatedAt: profile.updated_at,
       },
-      history: history.map((h) => ({
-        helixScore: h.helix_score,
-        riskCategory: h.risk_category,
-        dimensionScores: JSON.parse(h.dimension_scores || '{}'),
-        createdAt: h.created_at,
-      })),
+      history: history.map((h) => {
+        const grade = h.risk_category && ['A', 'B', 'C', 'D', 'E', 'F'].includes(h.risk_category)
+          ? h.risk_category as 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
+          : scoreToGrade(h.helix_score);
+        return {
+          helixGrade: grade,
+          helixScore: h.helix_score,
+          dimensionScores: JSON.parse(h.dimension_scores || '{}'),
+          createdAt: h.created_at,
+        };
+      }),
       trends: {
         scoreChange: trend,
         direction: trend < 0 ? 'improving' : trend > 0 ? 'deteriorating' : 'stable',

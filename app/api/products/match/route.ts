@@ -118,33 +118,38 @@ export async function POST(request: NextRequest) {
 }
 
 function calculatePricing(helixScore: number, product: any) {
-  // Risk-based pricing adjustment
+  // Risk-based pricing adjustment (based on grade ranges)
   let rateAdjustment = 0;
   let feeMultiplier = 1.0;
   let amountMultiplier = 1.0;
 
-  if (helixScore <= 25) {
-    // Prime
+  if (helixScore <= 20) {
+    // Grade A
     rateAdjustment = -2.0; // 2% discount
     feeMultiplier = 0.8;
     amountMultiplier = 1.2;
-  } else if (helixScore <= 45) {
-    // Near prime
+  } else if (helixScore <= 40) {
+    // Grade B
     rateAdjustment = 0;
     feeMultiplier = 1.0;
     amountMultiplier = 1.0;
-  } else if (helixScore <= 65) {
-    // Subprime
+  } else if (helixScore <= 60) {
+    // Grade C
     rateAdjustment = 3.0;
     feeMultiplier = 1.2;
     amountMultiplier = 0.8;
-  } else if (helixScore <= 85) {
-    // Deep subprime
+  } else if (helixScore <= 80) {
+    // Grade D
     rateAdjustment = 6.0;
     feeMultiplier = 1.5;
     amountMultiplier = 0.6;
+  } else if (helixScore <= 90) {
+    // Grade E
+    rateAdjustment = 8.0;
+    feeMultiplier = 1.8;
+    amountMultiplier = 0.5;
   } else {
-    // Decline (shouldn't reach here due to eligibility check)
+    // Grade F (shouldn't reach here due to eligibility check)
     rateAdjustment = 10.0;
     feeMultiplier = 2.0;
     amountMultiplier = 0.5;
@@ -165,17 +170,19 @@ function getAvailableTerms(helixScore: number, product: any): number[] {
   const minTerm = product.min_term_months;
   const maxTerm = product.max_term_months;
 
-  // Prime customers get more flexible terms
-  if (helixScore <= 25) {
+  // Grade A and B customers get more flexible terms
+  if (helixScore <= 20) {
+    // Grade A - most flexible
     for (let i = minTerm; i <= maxTerm; i += 6) {
       terms.push(i);
     }
-  } else if (helixScore <= 45) {
+  } else if (helixScore <= 40) {
+    // Grade B - flexible
     for (let i = minTerm; i <= maxTerm; i += 12) {
       terms.push(i);
     }
   } else {
-    // Limited terms for higher risk
+    // Limited terms for higher risk (Grade C, D, E, F)
     terms.push(minTerm);
     if (maxTerm > minTerm) {
       terms.push(Math.floor((minTerm + maxTerm) / 2));

@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       return {
         scenario: scenario,
         projectedScore: result.helixScore,
-        riskCategory: result.riskCategory,
+        projectedGrade: result.helixGrade,
         impact: impact,
         impactPercentage: ((impact / currentScore) * 100).toFixed(2),
         dimensionScores: result.dimensionScores,

@@ -92,23 +92,36 @@ export default function BankDashboard() {
             <div className="grid md:grid-cols-2 gap-6 mb-8">
               <Card>
                 <CardHeader>
-                  <h2 className="text-xl font-semibold">Risk Distribution</h2>
+                  <h2 className="text-xl font-semibold">Risk Grade Distribution</h2>
                 </CardHeader>
                 <CardBody>
                   <div className="space-y-4">
-                    {Object.entries(portfolio.distributions.riskCategories).map(([category, count]: [string, any]) => (
-                      <div key={category}>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm capitalize">{category.replace('_', ' ')}</span>
-                          <span className="text-sm font-semibold">{count}</span>
+                    {Object.entries(portfolio.distributions.riskGrades || portfolio.distributions.riskCategories || {}).map(([grade, count]: [string, any]) => {
+                      const getGradeColor = (g: string) => {
+                        const colors: Record<string, string> = {
+                          A: 'success',
+                          B: 'primary',
+                          C: 'warning',
+                          D: 'warning',
+                          E: 'danger',
+                          F: 'danger',
+                        };
+                        return colors[g] || 'default';
+                      };
+                      return (
+                        <div key={grade}>
+                          <div className="flex justify-between mb-1">
+                            <span className="text-sm font-semibold">Grade {grade}</span>
+                            <span className="text-sm font-semibold">{count}</span>
+                          </div>
+                          <Progress
+                            value={(count / portfolio.aggregateRisk.totalApplications) * 100}
+                            color={getGradeColor(grade) as any}
+                            size="sm"
+                          />
                         </div>
-                        <Progress
-                          value={(count / portfolio.aggregateRisk.totalApplications) * 100}
-                          color={category === 'prime' ? 'success' : category === 'near_prime' ? 'primary' : 'warning'}
-                          size="sm"
-                        />
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </CardBody>
               </Card>

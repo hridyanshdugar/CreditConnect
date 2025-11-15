@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
+import { scoreToGrade } from '@/lib/risk-calculator';
 
 export async function GET(request: NextRequest) {
   try {
@@ -38,19 +39,23 @@ export async function GET(request: NextRequest) {
     ).length;
     const stpEligible = applications.filter((a) => a.stp_eligible).length;
 
-    // Risk distribution
+    // Risk distribution by grade
     const riskDistribution = {
-      prime: 0,
-      near_prime: 0,
-      subprime: 0,
-      deep_subprime: 0,
-      decline: 0,
+      A: 0,
+      B: 0,
+      C: 0,
+      D: 0,
+      E: 0,
+      F: 0,
     };
 
     applications.forEach((app) => {
-      const category = app.risk_category;
-      if (category && riskDistribution.hasOwnProperty(category)) {
-        riskDistribution[category as keyof typeof riskDistribution]++;
+      // Use stored grade if available, otherwise compute from score
+      const grade = app.risk_category && ['A', 'B', 'C', 'D', 'E', 'F'].includes(app.risk_category)
+        ? app.risk_category as 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
+        : app.helix_score ? scoreToGrade(app.helix_score) : null;
+      if (grade && riskDistribution.hasOwnProperty(grade)) {
+        riskDistribution[grade as keyof typeof riskDistribution]++;
       }
     });
 
@@ -107,7 +112,7 @@ export async function GET(request: NextRequest) {
         totalLoanAmount: totalAmount,
       },
       distributions: {
-        riskCategories: riskDistribution,
+        riskGrades: riskDistribution,
         statusBreakdown: {
           pending: applications.filter((a) => a.status === 'pending').length,
           pre_approved: applications.filter((a) => a.status === 'pre_approved').length,

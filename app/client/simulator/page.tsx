@@ -193,7 +193,7 @@ export default function SimulatorPage() {
                     </div>
                     <div className="mb-2">
                       <Chip variant="flat" size="sm">
-                        {scenario.riskCategory.replace('_', ' ').toUpperCase()}
+                        Grade {scenario.projectedGrade || 'N/A'}
                       </Chip>
                       <span className="text-sm text-gray-600 ml-2">
                         Estimated timeframe: {scenario.timeline}

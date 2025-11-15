@@ -41,7 +41,6 @@ export interface RiskFlags {
   highRisk: boolean;
   requiresManualReview: boolean;
   fastTrackEligible: boolean;
-  primeCustomer: boolean;
 }
 
 export interface RiskExplanation {
@@ -68,8 +67,8 @@ export interface DimensionScores {
 export interface RiskProfile {
   id: string;
   userId: string;
-  helixScore: number; // 0-100, lower is better
-  riskCategory: 'prime' | 'near_prime' | 'subprime' | 'deep_subprime' | 'decline';
+  helixGrade: 'A' | 'B' | 'C' | 'D' | 'E' | 'F'; // Letter grade, A is best, F is worst
+  helixScore: number; // 0-100, lower is better (kept for internal calculations)
   stabilityIndex?: number;
   affordabilityRatio?: number;
   reliabilityScore?: number;
@@ -96,8 +95,10 @@ export interface Product {
   name: string;
   description?: string;
   productType: 'personal_loan' | 'auto_loan' | 'mortgage' | 'credit_line';
-  minHelixScore?: number;
-  maxHelixScore?: number;
+  minHelixGrade?: 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
+  maxHelixGrade?: 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
+  minHelixScore?: number; // Kept for backward compatibility
+  maxHelixScore?: number; // Kept for backward compatibility
   baseInterestRate: number;
   minLoanAmount: number;
   maxLoanAmount: number;

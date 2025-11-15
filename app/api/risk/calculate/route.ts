@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { HelixRiskCalculator, UserData } from '@/lib/risk-calculator';
+import { HelixRiskCalculator, UserData, scoreToGrade } from '@/lib/risk-calculator';
 import db from '@/lib/db';
 import { randomUUID } from 'crypto';
 
@@ -24,6 +24,8 @@ export async function POST(request: NextRequest) {
     const riskProfileId = randomUUID();
     const now = new Date().toISOString();
 
+    // Store helix_grade in risk_category column for backward compatibility
+    // We'll compute it from score when reading
     db.prepare(`
       INSERT INTO risk_profiles (
         id, user_id, helix_score, risk_category,
@@ -37,7 +39,7 @@ export async function POST(request: NextRequest) {
       riskProfileId,
       userId,
       result.helixScore,
-      result.riskCategory,
+      result.helixGrade, // Store grade in risk_category column
       result.dimensionScores.financial, // stability_index
       userData.debtToIncomeRatio || null, // affordability_ratio
       result.dimensionScores.behavioral, // reliability_score
@@ -67,7 +69,7 @@ export async function POST(request: NextRequest) {
       randomUUID(),
       userId,
       result.helixScore,
-      result.riskCategory,
+      result.helixGrade, // Store grade in risk_category column
       JSON.stringify(result.dimensionScores),
       now
     );
@@ -113,8 +115,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({
+      helixGrade: result.helixGrade,
       helixScore: result.helixScore,
-      riskCategory: result.riskCategory,
       dimensions: result.dimensionScores,
       explanation: result.explanation,
       confidence: result.confidenceInterval,

@@ -118,7 +118,7 @@ export class DataPipeline {
         riskProfileId,
         userId,
         result.helixScore,
-        result.riskCategory,
+        result.helixGrade, // Store grade in risk_category column
         result.dimensionScores.financial,
         userData.debtToIncomeRatio || null,
         result.dimensionScores.behavioral,
@@ -147,7 +147,7 @@ export class DataPipeline {
         randomUUID(),
         userId,
         result.helixScore,
-        result.riskCategory,
+        result.helixGrade, // Store grade in risk_category column
         JSON.stringify(result.dimensionScores),
         now
       );
