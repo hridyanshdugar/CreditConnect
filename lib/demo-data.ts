@@ -42,6 +42,9 @@ export async function seedDemoData() {
   // Create product matches (pre-approvals)
   await createProductMatches(users.clients, users.banks);
 
+  // Create sample financial documents for credit metrics
+  await createSampleFinancialDocuments(users.clients);
+
   console.log('✅ Demo data seeded successfully!');
   console.log('\n📋 Demo Account Credentials:');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -764,6 +767,217 @@ async function createProductMatches(clients: any[], banks: any[]) {
       }
     }
   }
+}
+
+async function createSampleFinancialDocuments(clients: any[]) {
+  console.log('📄 Creating sample financial documents for credit metrics...');
+
+  for (const client of clients) {
+    const userId = client.userId;
+    const now = new Date();
+
+    // Prime customer - excellent credit profile
+    if (client.email === 'prime@demo.com') {
+      // Credit card statements (2 cards, low utilization)
+      for (let i = 0; i < 6; i++) {
+        const date = new Date(now);
+        date.setMonth(date.getMonth() - i);
+        const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        
+        const dataId = randomUUID();
+        db.prepare(`
+          INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+          dataId,
+          userId,
+          'credit_card_statement',
+          `Credit Card Statement ${monthYear}.pdf`,
+          JSON.stringify({ fileName: `credit_card_${monthYear}.pdf` }),
+          JSON.stringify({
+            creditCardBalance: 2500,
+            creditLimit: 15000,
+            creditUtilization: 16.7,
+            minimumPayment: 75,
+          }),
+          monthYear,
+          date.toISOString()
+        );
+      }
+
+      // Loan statement (auto loan)
+      const loanDataId = randomUUID();
+      const loanDate = new Date(now);
+      loanDate.setFullYear(loanDate.getFullYear() - 3); // 3 years ago
+      db.prepare(`
+        INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        loanDataId,
+        userId,
+        'loan_statement',
+        'Auto Loan Statement.pdf',
+        JSON.stringify({ fileName: 'auto_loan.pdf' }),
+        JSON.stringify({
+          loanBalance: 12000,
+          loanMonthlyPayment: 350,
+          loanType: 'auto',
+          loanInterestRate: 4.5,
+        }),
+        `${loanDate.getFullYear()}-${String(loanDate.getMonth() + 1).padStart(2, '0')}`,
+        loanDate.toISOString()
+      );
+
+      // Bills (all paid on time)
+      for (let i = 0; i < 12; i++) {
+        const date = new Date(now);
+        date.setMonth(date.getMonth() - i);
+        const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        
+        const billDataId = randomUUID();
+        db.prepare(`
+          INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+          billDataId,
+          userId,
+          'bill',
+          `Utility Bill ${monthYear}.pdf`,
+          JSON.stringify({ fileName: `utility_${monthYear}.pdf` }),
+          JSON.stringify({
+            billAmount: 150,
+            billType: 'utility',
+            billDueDate: date.toISOString(),
+            billPaymentStatus: 'paid',
+            paymentTimeliness: 100,
+          }),
+          monthYear,
+          date.toISOString()
+        );
+      }
+    }
+
+    // Near-prime customer - good but not perfect
+    if (client.email === 'nearprime@demo.com') {
+      // Credit card (moderate utilization)
+      for (let i = 0; i < 6; i++) {
+        const date = new Date(now);
+        date.setMonth(date.getMonth() - i);
+        const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        
+        const dataId = randomUUID();
+        db.prepare(`
+          INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+          dataId,
+          userId,
+          'credit_card_statement',
+          `Credit Card Statement ${monthYear}.pdf`,
+          JSON.stringify({ fileName: `credit_card_${monthYear}.pdf` }),
+          JSON.stringify({
+            creditCardBalance: 4200,
+            creditLimit: 10000,
+            creditUtilization: 42,
+            minimumPayment: 125,
+          }),
+          monthYear,
+          date.toISOString()
+        );
+      }
+
+      // Bills (mostly on time, some late)
+      for (let i = 0; i < 12; i++) {
+        const date = new Date(now);
+        date.setMonth(date.getMonth() - i);
+        const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        const isLate = i < 2; // Last 2 months late
+        
+        const billDataId = randomUUID();
+        db.prepare(`
+          INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+          billDataId,
+          userId,
+          'bill',
+          `Utility Bill ${monthYear}.pdf`,
+          JSON.stringify({ fileName: `utility_${monthYear}.pdf` }),
+          JSON.stringify({
+            billAmount: 120,
+            billType: 'utility',
+            billDueDate: date.toISOString(),
+            billPaymentStatus: isLate ? 'overdue' : 'paid',
+            paymentTimeliness: isLate ? 70 : 100,
+          }),
+          monthYear,
+          date.toISOString()
+        );
+      }
+    }
+
+    // Subprime customer - high utilization, late payments
+    if (client.email === 'subprime@demo.com') {
+      // Credit card (high utilization)
+      for (let i = 0; i < 6; i++) {
+        const date = new Date(now);
+        date.setMonth(date.getMonth() - i);
+        const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        
+        const dataId = randomUUID();
+        db.prepare(`
+          INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+          dataId,
+          userId,
+          'credit_card_statement',
+          `Credit Card Statement ${monthYear}.pdf`,
+          JSON.stringify({ fileName: `credit_card_${monthYear}.pdf` }),
+          JSON.stringify({
+            creditCardBalance: 4800,
+            creditLimit: 6000,
+            creditUtilization: 80,
+            minimumPayment: 150,
+          }),
+          monthYear,
+          date.toISOString()
+        );
+      }
+
+      // Bills (many late/missed)
+      for (let i = 0; i < 12; i++) {
+        const date = new Date(now);
+        date.setMonth(date.getMonth() - i);
+        const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        const isMissed = i < 3; // Last 3 months missed
+        const isLate = i >= 3 && i < 6; // 3-6 months ago late
+        
+        const billDataId = randomUUID();
+        db.prepare(`
+          INSERT INTO financial_data (id, user_id, data_type, source, raw_data, processed_data, month_year, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+          billDataId,
+          userId,
+          'bill',
+          `Utility Bill ${monthYear}.pdf`,
+          JSON.stringify({ fileName: `utility_${monthYear}.pdf` }),
+          JSON.stringify({
+            billAmount: 100,
+            billType: 'utility',
+            billDueDate: date.toISOString(),
+            billPaymentStatus: isMissed ? 'overdue' : isLate ? 'overdue' : 'paid',
+            paymentTimeliness: isMissed ? 30 : isLate ? 60 : 100,
+          }),
+          monthYear,
+          date.toISOString()
+        );
+      }
+    }
+  }
+
+  console.log('✅ Sample financial documents created!');
 }
 
 function clearDemoData() {

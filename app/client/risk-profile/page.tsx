@@ -6,6 +6,11 @@ import { Card, CardBody, CardHeader, Chip, Progress, Divider } from '@heroui/rea
 import AppNavbar from '@/components/Navbar';
 import FileUpload from '@/components/FileUpload';
 import { TrendingUp, TrendingDown, AlertCircle, CheckCircle2 } from 'lucide-react';
+import PaymentHistoryTimeline from '@/components/credit-metrics/PaymentHistoryTimeline';
+import CreditUtilizationGauge from '@/components/credit-metrics/CreditUtilizationGauge';
+import CreditAgeTimeline from '@/components/credit-metrics/CreditAgeTimeline';
+import CreditInquiriesTracker from '@/components/credit-metrics/CreditInquiriesTracker';
+import CreditMixPortfolio from '@/components/credit-metrics/CreditMixPortfolio';
 
 export default function RiskProfilePage() {
   const router = useRouter();
@@ -14,6 +19,7 @@ export default function RiskProfilePage() {
   const [improvements, setImprovements] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
+  const [creditMetrics, setCreditMetrics] = useState<any>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -32,6 +38,7 @@ export default function RiskProfilePage() {
           loadRiskProfile(data.user.id, token);
           loadImprovements(data.user.id, token);
           loadUploadedFiles(data.user.id, token);
+          loadCreditMetrics(data.user.id, token);
         } else {
           router.push('/login');
         }
@@ -77,6 +84,17 @@ export default function RiskProfilePage() {
       .catch(() => {});
   };
 
+  const loadCreditMetrics = (userId: string, token: string) => {
+    fetch(`/api/risk/credit-metrics/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setCreditMetrics(data);
+      })
+      .catch(() => {});
+  };
+
   const handleUploadComplete = () => {
     const token = localStorage.getItem('token');
     if (token && user) {
@@ -85,6 +103,7 @@ export default function RiskProfilePage() {
         loadRiskProfile(user.id, token);
         loadImprovements(user.id, token);
         loadUploadedFiles(user.id, token);
+        loadCreditMetrics(user.id, token);
       }, 3000); // Wait 3 seconds for processing
     }
   };
@@ -320,6 +339,43 @@ export default function RiskProfilePage() {
                   </div>
                 </CardBody>
               </Card>
+            )}
+
+            {/* Credit Metrics Section */}
+            {creditMetrics && (
+              <div className="space-y-6">
+                <div className="mb-4">
+                  <h2 className="text-2xl font-bold">Credit Score Factors</h2>
+                  <p className="text-default-600">
+                    Detailed breakdown of factors that influence your credit score
+                  </p>
+                </div>
+
+                {/* Payment History (35%) */}
+                {creditMetrics.paymentHistory && (
+                  <PaymentHistoryTimeline {...creditMetrics.paymentHistory} />
+                )}
+
+                {/* Credit Utilization (30%) */}
+                {creditMetrics.creditUtilization && (
+                  <CreditUtilizationGauge {...creditMetrics.creditUtilization} />
+                )}
+
+                {/* Credit Age (15%) */}
+                {creditMetrics.creditAge && (
+                  <CreditAgeTimeline {...creditMetrics.creditAge} />
+                )}
+
+                {/* Credit Inquiries (10%) */}
+                {creditMetrics.creditInquiries && (
+                  <CreditInquiriesTracker {...creditMetrics.creditInquiries} />
+                )}
+
+                {/* Credit Mix (10%) */}
+                {creditMetrics.creditMix && (
+                  <CreditMixPortfolio {...creditMetrics.creditMix} />
+                )}
+              </div>
             )}
           </div>
         ) : (
