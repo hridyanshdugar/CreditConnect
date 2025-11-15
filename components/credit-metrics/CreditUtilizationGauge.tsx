@@ -55,9 +55,6 @@ export default function CreditUtilizationGauge({
     }
   };
 
-  // Calculate gauge rotation (-90 to 90 degrees)
-  const gaugeRotation = -90 + (Math.min(100, utilization) * 1.8);
-  
   // Get recommendation based on zone
   const getRecommendation = () => {
     if (utilization <= 10) {
@@ -108,127 +105,105 @@ export default function CreditUtilizationGauge({
         </div>
       </CardHeader>
       <CardBody className="space-y-6 pt-8">
-        {/* Modern Gauge Visualization */}
-        <div className="flex justify-center items-center py-4">
-          <div className="relative w-72 h-44">
-            {/* Gauge Background */}
-            <svg className="w-full h-full" viewBox="0 0 200 120">
-              <defs>
-                {/* Gradient definitions */}
-                <linearGradient id="excellentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style={{ stopColor: '#22c55e', stopOpacity: 1 }} />
-                  <stop offset="100%" style={{ stopColor: '#16a34a', stopOpacity: 1 }} />
-                </linearGradient>
-                <linearGradient id="goodGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style={{ stopColor: '#3b82f6', stopOpacity: 1 }} />
-                  <stop offset="100%" style={{ stopColor: '#2563eb', stopOpacity: 1 }} />
-                </linearGradient>
-                <linearGradient id="fairGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style={{ stopColor: '#f59e0b', stopOpacity: 1 }} />
-                  <stop offset="100%" style={{ stopColor: '#d97706', stopOpacity: 1 }} />
-                </linearGradient>
-                <linearGradient id="poorGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style={{ stopColor: '#ef4444', stopOpacity: 1 }} />
-                  <stop offset="100%" style={{ stopColor: '#dc2626', stopOpacity: 1 }} />
-                </linearGradient>
-                
-                {/* Shadow filter */}
-                <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-                  <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
-                  <feOffset dx="0" dy="2" result="offsetblur"/>
-                  <feComponentTransfer>
-                    <feFuncA type="linear" slope="0.3"/>
-                  </feComponentTransfer>
-                  <feMerge>
-                    <feMergeNode/>
-                    <feMergeNode in="SourceGraphic"/>
-                  </feMerge>
-                </filter>
-              </defs>
-              
-              {/* Background track */}
-              <path
-                d="M 20 100 A 80 80 0 0 1 180 100"
-                fill="none"
-                stroke="#f4f4f5"
-                strokeWidth="24"
-                strokeLinecap="round"
-              />
-              
-              {/* Colored zones */}
-              {/* Excellent zone (0-10%) - Green */}
-              <path
-                d="M 20 100 A 80 80 0 0 1 36 36"
-                fill="none"
-                stroke="url(#excellentGradient)"
-                strokeWidth="24"
-                strokeLinecap="round"
-              />
-              
-              {/* Good zone (10-30%) - Blue */}
-              <path
-                d="M 36 36 A 80 80 0 0 1 84 20"
-                fill="none"
-                stroke="url(#goodGradient)"
-                strokeWidth="24"
-                strokeLinecap="round"
-              />
-              
-              {/* Fair zone (30-50%) - Orange */}
-              <path
-                d="M 84 20 A 80 80 0 0 1 116 20"
-                fill="none"
-                stroke="url(#fairGradient)"
-                strokeWidth="24"
-                strokeLinecap="round"
-              />
-              
-              {/* Poor zone (50%+) - Red */}
-              <path
-                d="M 116 20 A 80 80 0 0 1 180 100"
-                fill="none"
-                stroke="url(#poorGradient)"
-                strokeWidth="24"
-                strokeLinecap="round"
-              />
-              
-              {/* Center dot indicators */}
-              <circle cx="20" cy="100" r="3" fill="#22c55e" />
-              <circle cx="36" cy="36" r="3" fill="#3b82f6" />
-              <circle cx="100" cy="20" r="3" fill="#f59e0b" />
-              <circle cx="164" cy="36" r="3" fill="#ef4444" />
-              <circle cx="180" cy="100" r="3" fill="#dc2626" />
-              
-              {/* Needle */}
-              <g transform={`rotate(${gaugeRotation} 100 100)`} filter="url(#shadow)">
-                {/* Needle shadow */}
-                <path
-                  d="M 100 100 L 98 98 L 100 30 L 102 98 Z"
-                  fill="#18181b"
-                  opacity="0.2"
-                />
-                {/* Needle */}
-                <path
-                  d="M 100 100 L 98 98 L 100 30 L 102 98 Z"
-                  fill="#18181b"
-                />
-                {/* Center circle */}
-                <circle cx="100" cy="100" r="6" fill="#18181b" />
-                <circle cx="100" cy="100" r="4" fill="white" />
-              </g>
-              
-              {/* Labels */}
-              <text x="20" y="115" fontSize="10" fill="#71717a" textAnchor="middle">0%</text>
-              <text x="100" y="10" fontSize="10" fill="#71717a" textAnchor="middle">50%</text>
-              <text x="180" y="115" fontSize="10" fill="#71717a" textAnchor="middle">100%</text>
-            </svg>
-            
-            {/* Percentage Display */}
-            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-center">
-              <div className={`text-5xl font-bold ${getZoneColor()}`}>
-                {utilization.toFixed(1)}%
+        {/* Modern Bar Visualization */}
+        <div className="space-y-6 py-4">
+          {/* Main Percentage Display */}
+          <div className="text-center">
+            <div className={`text-6xl font-bold ${getZoneColor()} mb-2`}>
+              {utilization.toFixed(1)}%
+            </div>
+            <div className="text-sm text-default-500">Current Utilization</div>
+          </div>
+
+          {/* Colorful Zone Bar */}
+          <div className="relative">
+            {/* Background bar with zones */}
+            <div className="h-16 rounded-2xl overflow-hidden shadow-lg border-3 border-white relative">
+              <div className="absolute inset-0 flex">
+                {/* Excellent zone (0-10%) */}
+                <div className="h-full bg-gradient-to-r from-success-400 to-success-500" style={{ width: '10%' }} />
+                {/* Good zone (10-30%) */}
+                <div className="h-full bg-gradient-to-r from-primary-400 to-primary-500" style={{ width: '20%' }} />
+                {/* Fair zone (30-50%) */}
+                <div className="h-full bg-gradient-to-r from-warning-400 to-warning-500" style={{ width: '20%' }} />
+                {/* Poor zone (50-100%) */}
+                <div className="h-full bg-gradient-to-r from-danger-400 to-danger-500" style={{ width: '50%' }} />
               </div>
-              <div className="text-xs text-default-400 uppercase tracking-wider">Utilization</div>
+              
+              {/* Current position indicator */}
+              <div 
+                className="absolute top-0 bottom-0 flex items-center transition-all duration-500 ease-out"
+                style={{ left: `${Math.min(100, utilization)}%` }}
+              >
+                {/* Indicator line */}
+                <div className="relative -ml-1">
+                  <div className="w-2 h-16 bg-white shadow-xl rounded-full" />
+                  {/* Indicator triangle */}
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <div className="w-0 h-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white drop-shadow-lg" />
+                  </div>
+                  <div className="absolute -bottom-3 left-1/2 -translate-x-1/2">
+                    <div className="w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-white drop-shadow-lg" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Zone markers */}
+            <div className="flex justify-between mt-2 px-1">
+              <div className="text-xs text-default-500 font-medium">0%</div>
+              <div className="text-xs text-default-500 font-medium absolute left-[10%] -ml-3">10%</div>
+              <div className="text-xs text-default-500 font-medium absolute left-[30%] -ml-3">30%</div>
+              <div className="text-xs text-default-500 font-medium absolute left-[50%] -ml-3">50%</div>
+              <div className="text-xs text-default-500 font-medium">100%</div>
+            </div>
+          </div>
+
+          {/* Zone labels with current indicator */}
+          <div className="grid grid-cols-4 gap-2 mt-6">
+            <div className={`p-3 rounded-lg border-2 transition-all ${
+              zone === 'excellent' 
+                ? 'bg-success-50 border-success-500 shadow-lg scale-105' 
+                : 'bg-default-50 border-default-200'
+            }`}>
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-3 h-3 rounded-full bg-success-500" />
+                <span className="text-xs font-semibold text-default-700">Excellent</span>
+              </div>
+              <div className="text-xs text-default-500">0-10%</div>
+            </div>
+            <div className={`p-3 rounded-lg border-2 transition-all ${
+              zone === 'good' 
+                ? 'bg-primary-50 border-primary-500 shadow-lg scale-105' 
+                : 'bg-default-50 border-default-200'
+            }`}>
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-3 h-3 rounded-full bg-primary-500" />
+                <span className="text-xs font-semibold text-default-700">Good</span>
+              </div>
+              <div className="text-xs text-default-500">10-30%</div>
+            </div>
+            <div className={`p-3 rounded-lg border-2 transition-all ${
+              zone === 'fair' 
+                ? 'bg-warning-50 border-warning-500 shadow-lg scale-105' 
+                : 'bg-default-50 border-default-200'
+            }`}>
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-3 h-3 rounded-full bg-warning-500" />
+                <span className="text-xs font-semibold text-default-700">Fair</span>
+              </div>
+              <div className="text-xs text-default-500">30-50%</div>
+            </div>
+            <div className={`p-3 rounded-lg border-2 transition-all ${
+              zone === 'poor' 
+                ? 'bg-danger-50 border-danger-500 shadow-lg scale-105' 
+                : 'bg-default-50 border-default-200'
+            }`}>
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-3 h-3 rounded-full bg-danger-500" />
+                <span className="text-xs font-semibold text-default-700">Poor</span>
+              </div>
+              <div className="text-xs text-default-500">50-100%</div>
             </div>
           </div>
         </div>
@@ -270,11 +245,11 @@ export default function CreditUtilizationGauge({
           </div>
         </div>
 
-        {/* Visual Progress Bar */}
-        <div className="space-y-3">
+        {/* Detailed Progress Bar */}
+        <div className="space-y-3 p-4 bg-default-50 rounded-xl">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-default-600 font-medium">Credit Usage</span>
-            <span className="text-default-500">
+            <span className="text-default-700 font-semibold">Detailed Breakdown</span>
+            <span className="text-default-600">
               ${totalCreditUsed.toLocaleString()} of ${totalCreditLimit.toLocaleString()}
             </span>
           </div>
@@ -283,28 +258,8 @@ export default function CreditUtilizationGauge({
             color={getProgressColor()}
             size="lg"
             className="w-full"
-            showValueLabel={false}
+            showValueLabel={true}
           />
-        </div>
-
-        {/* Zone Legend */}
-        <div className="grid grid-cols-2 gap-2">
-          <div className="flex items-center gap-2 text-xs">
-            <div className="w-3 h-3 rounded-full bg-success" />
-            <span className="text-default-600">Excellent (0-10%)</span>
-          </div>
-          <div className="flex items-center gap-2 text-xs">
-            <div className="w-3 h-3 rounded-full bg-primary" />
-            <span className="text-default-600">Good (10-30%)</span>
-          </div>
-          <div className="flex items-center gap-2 text-xs">
-            <div className="w-3 h-3 rounded-full bg-warning" />
-            <span className="text-default-600">Fair (30-50%)</span>
-          </div>
-          <div className="flex items-center gap-2 text-xs">
-            <div className="w-3 h-3 rounded-full bg-danger" />
-            <span className="text-default-600">Poor (50%+)</span>
-          </div>
         </div>
       </CardBody>
     </Card>

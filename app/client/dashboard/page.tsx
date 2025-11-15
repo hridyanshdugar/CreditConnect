@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardBody, CardHeader, Button, Progress, Chip } from '@heroui/react';
 import AppNavbar from '@/components/Navbar';
+import CreditScoreBreakdown from '@/components/credit-metrics/CreditScoreBreakdown';
 import Link from 'next/link';
 import { BarChart3, ShoppingBag, TrendingUp } from 'lucide-react';
 
@@ -145,6 +146,11 @@ export default function ClientDashboard() {
             </CardBody>
           </Card>
         )}
+
+        {/* Credit Score Breakdown */}
+        <div className="mb-8">
+          <CreditScoreBreakdown />
+        </div>
 
         <div className="grid md:grid-cols-3 gap-6">
           <Card 
