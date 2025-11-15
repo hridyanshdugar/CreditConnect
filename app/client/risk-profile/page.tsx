@@ -2,23 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardBody, CardHeader, Button, Input, Chip, Accordion, AccordionItem } from '@heroui/react';
+import { Card, CardBody, CardHeader, Chip, Progress, Divider } from '@heroui/react';
 import AppNavbar from '@/components/Navbar';
+import FileUpload from '@/components/FileUpload';
+import { TrendingUp, TrendingDown, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function RiskProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [riskProfile, setRiskProfile] = useState<any>(null);
   const [improvements, setImprovements] = useState<any>(null);
-  const [userData, setUserData] = useState({
-    monthlyIncome: '',
-    employmentDuration: '',
-    debtToIncomeRatio: '',
-    paymentTimeliness: '',
-    averageMonthlyBalance: '',
-  });
-  const [loading, setLoading] = useState(false);
-  const [calculating, setCalculating] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -36,11 +31,13 @@ export default function RiskProfilePage() {
           setUser(data.user);
           loadRiskProfile(data.user.id, token);
           loadImprovements(data.user.id, token);
+          loadUploadedFiles(data.user.id, token);
         } else {
           router.push('/login');
         }
       })
-      .catch(() => router.push('/login'));
+      .catch(() => router.push('/login'))
+      .finally(() => setLoading(false));
   }, [router]);
 
   const loadRiskProfile = (userId: string, token: string) => {
@@ -67,167 +64,235 @@ export default function RiskProfilePage() {
       .catch(() => {});
   };
 
-  const handleCalculate = async () => {
-    setCalculating(true);
+  const loadUploadedFiles = (userId: string, token: string) => {
+    fetch(`/api/data/user/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.files) {
+          setUploadedFiles(data.files);
+        }
+      })
+      .catch(() => {});
+  };
+
+  const handleUploadComplete = () => {
     const token = localStorage.getItem('token');
-    if (!token || !user) return;
-
-    const data = {
-      monthlyIncome: userData.monthlyIncome ? parseFloat(userData.monthlyIncome) : undefined,
-      employmentDuration: userData.employmentDuration ? parseInt(userData.employmentDuration) : undefined,
-      debtToIncomeRatio: userData.debtToIncomeRatio ? parseFloat(userData.debtToIncomeRatio) / 100 : undefined,
-      paymentTimeliness: userData.paymentTimeliness ? parseFloat(userData.paymentTimeliness) : undefined,
-      averageMonthlyBalance: userData.averageMonthlyBalance ? parseFloat(userData.averageMonthlyBalance) : undefined,
-      // Default values for other required fields
-      documentAuthenticity: 90,
-      addressVerification: true,
-      phoneNumberStability: 24,
-    };
-
-    try {
-      const res = await fetch('/api/risk/calculate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          userData: data,
-        }),
-      });
-
-      const result = await res.json();
-      if (res.ok) {
+    if (token && user) {
+      // Reload everything after processing
+      setTimeout(() => {
         loadRiskProfile(user.id, token);
         loadImprovements(user.id, token);
-      } else {
-        alert(result.error || 'Failed to calculate risk');
-      }
-    } catch (error) {
-      alert('An error occurred');
-    } finally {
-      setCalculating(false);
+        loadUploadedFiles(user.id, token);
+      }, 3000); // Wait 3 seconds for processing
     }
   };
+
+  const getRiskColor = (score: number) => {
+    if (score <= 25) return 'success';
+    if (score <= 45) return 'primary';
+    if (score <= 65) return 'warning';
+    return 'danger';
+  };
+
+  const getRiskLabel = (category: string) => {
+    const labels: Record<string, string> = {
+      prime: 'Prime',
+      near_prime: 'Near Prime',
+      subprime: 'Subprime',
+      deep_subprime: 'Deep Subprime',
+      decline: 'Decline',
+    };
+    return labels[category] || category;
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div>Loading...</div>
+      </div>
+    );
+  }
 
   if (!user) return null;
 
   return (
     <div className="min-h-screen bg-background">
       <AppNavbar user={user} />
-      <main className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">My Risk Profile</h1>
+      <main className="container mx-auto px-4 py-8 max-w-6xl">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold mb-2">My Risk Profile</h1>
+          <p className="text-default-600">
+            Upload your financial documents to automatically calculate your Helix Risk Score
+          </p>
+        </div>
 
-        {!riskProfile ? (
+        {/* File Upload Section */}
+        <div className="mb-8">
+          <FileUpload userId={user.id} onUploadComplete={handleUploadComplete} />
+        </div>
+
+        {/* Uploaded Files Summary */}
+        {uploadedFiles.length > 0 && (
           <Card className="mb-8">
             <CardHeader>
-              <h2 className="text-xl font-semibold">Calculate Your Risk Profile</h2>
+              <h2 className="text-xl font-semibold">Uploaded Documents</h2>
             </CardHeader>
             <CardBody>
-              <div className="space-y-4">
-                <Input
-                  label="Monthly Income ($)"
-                  type="number"
-                  value={userData.monthlyIncome}
-                  onChange={(e) => setUserData({ ...userData, monthlyIncome: e.target.value })}
-                />
-                <Input
-                  label="Employment Duration (months)"
-                  type="number"
-                  value={userData.employmentDuration}
-                  onChange={(e) => setUserData({ ...userData, employmentDuration: e.target.value })}
-                />
-                <Input
-                  label="Debt-to-Income Ratio (%)"
-                  type="number"
-                  value={userData.debtToIncomeRatio}
-                  onChange={(e) => setUserData({ ...userData, debtToIncomeRatio: e.target.value })}
-                />
-                <Input
-                  label="Payment Timeliness (0-100)"
-                  type="number"
-                  value={userData.paymentTimeliness}
-                  onChange={(e) => setUserData({ ...userData, paymentTimeliness: e.target.value })}
-                />
-                <Input
-                  label="Average Monthly Balance ($)"
-                  type="number"
-                  value={userData.averageMonthlyBalance}
-                  onChange={(e) => setUserData({ ...userData, averageMonthlyBalance: e.target.value })}
-                />
-                <Button
-                  color="primary"
-                  onPress={handleCalculate}
-                  isLoading={calculating}
-                  fullWidth
-                >
-                  Calculate Risk Score
-                </Button>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="text-center p-4 bg-default-50 rounded-lg">
+                  <div className="text-2xl font-bold text-primary">{uploadedFiles.length}</div>
+                  <div className="text-sm text-default-600">Total Files</div>
+                </div>
+                <div className="text-center p-4 bg-default-50 rounded-lg">
+                  <div className="text-2xl font-bold text-success">
+                    {uploadedFiles.filter(f => f.status === 'processed').length}
+                  </div>
+                  <div className="text-sm text-default-600">Processed</div>
+                </div>
+                <div className="text-center p-4 bg-default-50 rounded-lg">
+                  <div className="text-2xl font-bold text-warning">
+                    {uploadedFiles.filter(f => f.status === 'processing').length}
+                  </div>
+                  <div className="text-sm text-default-600">Processing</div>
+                </div>
               </div>
             </CardBody>
           </Card>
-        ) : (
-          <>
-            <Card className="mb-8">
-              <CardHeader>
-                <h2 className="text-xl font-semibold">Risk Assessment</h2>
-              </CardHeader>
-              <CardBody>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <div className="text-4xl font-bold mb-2">{riskProfile.helixScore.toFixed(1)}</div>
-                    <Chip color={riskProfile.helixScore <= 25 ? 'success' : riskProfile.helixScore <= 45 ? 'primary' : 'warning'}>
-                      {riskProfile.riskCategory.replace('_', ' ').toUpperCase()}
-                    </Chip>
-                    <p className="text-sm text-gray-500 mt-4">
-                      Confidence: {(riskProfile.confidenceInterval * 100).toFixed(1)}%
-                    </p>
+        )}
+
+        {/* Risk Profile Display */}
+        {riskProfile ? (
+          <div className="space-y-6">
+            {/* Main Risk Score Card */}
+            <Card className="border-2">
+              <CardBody className="p-8">
+                <div className="text-center mb-6">
+                  <p className="text-sm text-default-600 mb-2">Your Helix Risk Score</p>
+                  <div 
+                    className="text-7xl font-bold mb-4"
+                    style={{ 
+                      color: `var(--${getRiskColor(riskProfile.helixScore)}-500)` 
+                    }}
+                  >
+                    {riskProfile.helixScore.toFixed(1)}
                   </div>
-                  <div>
-                    <h3 className="font-semibold mb-2">Summary</h3>
-                    <p className="text-sm">{riskProfile.explanation?.summary || 'No summary available'}</p>
+                  <Chip 
+                    color={getRiskColor(riskProfile.helixScore) as any} 
+                    variant="flat" 
+                    size="lg"
+                    className="mb-4"
+                  >
+                    {getRiskLabel(riskProfile.riskCategory)}
+                  </Chip>
+                  <div className="max-w-md mx-auto mt-4">
+                    <Progress
+                      value={100 - riskProfile.helixScore}
+                      color={getRiskColor(riskProfile.helixScore) as any}
+                      className="mb-2"
+                    />
+                    <p className="text-xs text-default-500">
+                      Lower scores indicate lower risk • Confidence: {(riskProfile.confidenceInterval * 100).toFixed(1)}%
+                    </p>
                   </div>
                 </div>
               </CardBody>
             </Card>
 
+            {/* Dimension Scores */}
+            <Card>
+              <CardHeader>
+                <h2 className="text-xl font-semibold">Risk Dimension Breakdown</h2>
+              </CardHeader>
+              <CardBody>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {Object.entries(riskProfile.dimensionScores || {}).map(([key, value]: [string, any]) => (
+                    <div key={key} className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium capitalize">
+                          {key.replace('_', ' ')}
+                        </span>
+                        <span className="text-sm font-bold">
+                          {value.toFixed(1)}
+                        </span>
+                      </div>
+                      <Progress
+                        value={100 - value}
+                        color={getRiskColor(value) as any}
+                        size="sm"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </CardBody>
+            </Card>
+
+            {/* Summary and Explanation */}
             {riskProfile.explanation && (
-              <Card className="mb-8">
+              <Card>
                 <CardHeader>
-                  <h2 className="text-xl font-semibold">Explanation</h2>
+                  <h2 className="text-xl font-semibold">Risk Assessment Summary</h2>
                 </CardHeader>
-                <CardBody>
-                  <Accordion>
-                    <AccordionItem key="factors" title="Key Factors">
-                      <ul className="list-disc list-inside space-y-2">
-                        {riskProfile.explanation.keyFactors?.map((factor: any, i: number) => (
-                          <li key={i} className="text-sm">
-                            <strong>{factor.factor}:</strong> {factor.explanation}
-                          </li>
+                <CardBody className="space-y-6">
+                  <div>
+                    <p className="text-default-700 leading-relaxed">
+                      {riskProfile.explanation.summary || 'No summary available'}
+                    </p>
+                  </div>
+
+                  <Divider />
+
+                  {riskProfile.explanation.strengths && riskProfile.explanation.strengths.length > 0 && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <CheckCircle2 className="w-5 h-5 text-success" />
+                        <h3 className="font-semibold text-success">Strengths</h3>
+                      </div>
+                      <ul className="list-disc list-inside space-y-1 ml-7">
+                        {riskProfile.explanation.strengths.map((s: string, i: number) => (
+                          <li key={i} className="text-sm text-default-700">{s}</li>
                         ))}
                       </ul>
-                    </AccordionItem>
-                    <AccordionItem key="strengths" title="Strengths">
-                      <ul className="list-disc list-inside space-y-2">
-                        {riskProfile.explanation.strengths?.map((s: string, i: number) => (
-                          <li key={i} className="text-sm">{s}</li>
+                    </div>
+                  )}
+
+                  {riskProfile.explanation.concerns && riskProfile.explanation.concerns.length > 0 && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <AlertCircle className="w-5 h-5 text-warning" />
+                        <h3 className="font-semibold text-warning">Areas of Concern</h3>
+                      </div>
+                      <ul className="list-disc list-inside space-y-1 ml-7">
+                        {riskProfile.explanation.concerns.map((c: string, i: number) => (
+                          <li key={i} className="text-sm text-default-700">{c}</li>
                         ))}
                       </ul>
-                    </AccordionItem>
-                    <AccordionItem key="concerns" title="Concerns">
-                      <ul className="list-disc list-inside space-y-2">
-                        {riskProfile.explanation.concerns?.map((c: string, i: number) => (
-                          <li key={i} className="text-sm">{c}</li>
+                    </div>
+                  )}
+
+                  {riskProfile.explanation.keyFactors && riskProfile.explanation.keyFactors.length > 0 && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <TrendingUp className="w-5 h-5 text-primary" />
+                        <h3 className="font-semibold">Key Factors</h3>
+                      </div>
+                      <div className="space-y-2 ml-7">
+                        {riskProfile.explanation.keyFactors.slice(0, 5).map((factor: any, i: number) => (
+                          <div key={i} className="text-sm">
+                            <span className="font-medium">{factor.factor}:</span>{' '}
+                            <span className="text-default-600">{factor.explanation}</span>
+                          </div>
                         ))}
-                      </ul>
-                    </AccordionItem>
-                  </Accordion>
+                      </div>
+                    </div>
+                  )}
                 </CardBody>
               </Card>
             )}
 
-            {improvements && improvements.recommendations && (
+            {/* Improvement Recommendations */}
+            {improvements && improvements.recommendations && improvements.recommendations.length > 0 && (
               <Card>
                 <CardHeader>
                   <h2 className="text-xl font-semibold">Improvement Recommendations</h2>
@@ -235,12 +300,17 @@ export default function RiskProfilePage() {
                 <CardBody>
                   <div className="space-y-4">
                     {improvements.recommendations.map((rec: any, i: number) => (
-                      <div key={i} className="border-l-4 border-primary pl-4">
-                        <h3 className="font-semibold">{rec.dimension}</h3>
-                        <p className="text-sm text-gray-600 mb-2">
-                          Potential improvement: {rec.potentialScoreImprovement} points in {rec.timeframe}
+                      <div key={i} className="border-l-4 border-primary pl-4 py-2">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="font-semibold">{rec.dimension}</h3>
+                          <Chip size="sm" variant="flat" color="primary">
+                            +{rec.potentialScoreImprovement} points
+                          </Chip>
+                        </div>
+                        <p className="text-xs text-default-500 mb-2">
+                          Estimated timeframe: {rec.timeframe}
                         </p>
-                        <ul className="list-disc list-inside text-sm space-y-1">
+                        <ul className="list-disc list-inside text-sm space-y-1 text-default-700">
                           {rec.recommendedActions.map((action: string, j: number) => (
                             <li key={j}>{action}</li>
                           ))}
@@ -251,7 +321,26 @@ export default function RiskProfilePage() {
                 </CardBody>
               </Card>
             )}
-          </>
+          </div>
+        ) : (
+          <Card>
+            <CardBody className="text-center py-12">
+              <div className="max-w-md mx-auto">
+                <TrendingUp className="w-16 h-16 text-default-300 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">No Risk Profile Yet</h3>
+                <p className="text-default-600 mb-6">
+                  Upload your financial documents above to automatically calculate your Helix Risk Score. 
+                  We'll analyze your bank statements, pay stubs, and tax returns to provide you with 
+                  a comprehensive risk assessment.
+                </p>
+                <div className="text-sm text-default-500 space-y-1">
+                  <p>📄 Upload bank statements to analyze cash flow and payment history</p>
+                  <p>💼 Upload pay stubs to verify income and employment</p>
+                  <p>📊 Upload tax returns for comprehensive income verification</p>
+                </div>
+              </div>
+            </CardBody>
+          </Card>
         )}
       </main>
     </div>

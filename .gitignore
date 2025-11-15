@@ -40,6 +40,9 @@ next-env.d.ts
 /data/*.db-shm
 /data/*.db-wal
 
+# uploads
+/uploads
+
 # IDE
 .vscode/
 .idea/
