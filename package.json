@@ -3,7 +3,8 @@
   "scripts": {
     "dev": "next dev --turbo",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "postinstall": "pnpm rebuild better-sqlite3 || true"
   },
   "dependencies": {
     "@heroui/react": "^2.4.0",
