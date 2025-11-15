@@ -180,7 +180,7 @@ export function initDatabase() {
     CREATE TABLE IF NOT EXISTS financial_data (
       id TEXT PRIMARY KEY,
       user_id TEXT NOT NULL,
-      data_type TEXT NOT NULL CHECK(data_type IN ('bank_statement', 'pay_stub', 'tax_return', 'transaction', 'balance')),
+      data_type TEXT NOT NULL CHECK(data_type IN ('bank_statement', 'pay_stub', 'tax_return', 'credit_card_statement', 'loan_statement', 'debt_statement', 'bill', 'transaction', 'balance')),
       source TEXT,
       raw_data TEXT, -- JSON string
       processed_data TEXT, -- JSON string

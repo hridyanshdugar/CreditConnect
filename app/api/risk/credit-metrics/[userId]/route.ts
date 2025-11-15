@@ -23,7 +23,15 @@ export async function GET(
     }>;
 
     // Parse processed data
-    const processedDocs = allData.map(row => JSON.parse(row.processed_data));
+    const processedDocs = allData.map(row => {
+      try {
+        return typeof row.processed_data === 'string' 
+          ? JSON.parse(row.processed_data) 
+          : row.processed_data || {};
+      } catch {
+        return {};
+      }
+    });
 
     // Calculate credit metrics
     const metrics = calculateCreditMetrics(processedDocs, allData);
@@ -82,12 +90,25 @@ function calculatePaymentHistory(processedDocs: any[], allData: any[]) {
     const bills = monthData.filter(d => d.data_type === 'bill');
     
     let status: 'on-time' | 'late-30' | 'late-60' | 'missed' = 'on-time';
+    let hasBill = false;
     
     for (const bill of bills) {
-      const billData = JSON.parse(bill.processed_data);
-      if (billData.billPaymentStatus) {
+      hasBill = true;
+      let billData;
+      try {
+        billData = typeof bill.processed_data === 'string' 
+          ? JSON.parse(bill.processed_data) 
+          : bill.processed_data;
+      } catch {
+        continue;
+      }
+      
+      if (billData && billData.billPaymentStatus) {
         if (billData.billPaymentStatus === 'paid') {
-          status = 'on-time';
+          // Keep on-time if already on-time, but don't override a worse status
+          if (status === 'on-time') {
+            status = 'on-time';
+          }
         } else if (billData.billPaymentStatus === 'overdue' || billData.billPaymentStatus === 'past due') {
           // Calculate days overdue
           if (billData.billDueDate) {
@@ -97,21 +118,24 @@ function calculatePaymentHistory(processedDocs: any[], allData: any[]) {
               if (daysOverdue >= 60) {
                 status = 'missed';
               } else if (daysOverdue >= 30) {
-                status = 'late-60';
+                status = status === 'missed' ? 'missed' : 'late-60';
               } else {
-                status = 'late-30';
+                status = status === 'missed' || status === 'late-60' ? status : 'late-30';
               }
             } catch {
-              status = 'late-30';
+              status = status === 'missed' || status === 'late-60' ? status : 'late-30';
             }
           } else {
-            status = 'late-30';
+            status = status === 'missed' || status === 'late-60' ? status : 'late-30';
           }
         } else {
           status = 'missed';
         }
       }
     }
+    
+    // If no bills found for this month, check if we should mark as on-time (assume no payment needed)
+    // or leave as on-time (default)
 
     months.push({
       month: date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
@@ -144,14 +168,42 @@ function calculatePaymentHistory(processedDocs: any[], allData: any[]) {
 }
 
 function calculateCreditUtilization(processedDocs: any[]) {
-  const creditCards = processedDocs.filter(d => d.creditCardBalance !== undefined);
+  const creditCards = processedDocs.filter(d => d && d.creditCardBalance !== undefined);
   
+  // If we have multiple statements for the same card, we should use the most recent
+  // For now, we'll sum all unique cards (in production, you'd dedupe by account number)
   let totalCreditUsed = 0;
   let totalCreditLimit = 0;
 
+  // Group by unique cards (using balance + limit as identifier)
+  // In production, you'd use account numbers
+  const cardMap = new Map<string, { balance: number; limit: number }>();
+  
   for (const card of creditCards) {
-    totalCreditUsed += card.creditCardBalance || 0;
-    totalCreditLimit += card.creditLimit || 0;
+    const balance = card.creditCardBalance || 0;
+    const limit = card.creditLimit || (card.creditUtilization && card.creditUtilization > 0 
+      ? (balance / (card.creditUtilization / 100)) 
+      : 0);
+    
+    // Use limit as the key (same limit = likely same card)
+    // If no limit, use balance as fallback
+    const cardKey = limit > 0 ? `limit-${limit}` : `balance-${balance}`;
+    
+    if (!cardMap.has(cardKey)) {
+      cardMap.set(cardKey, { balance, limit });
+    } else {
+      // Update with latest balance if it's higher (more recent statement)
+      const existing = cardMap.get(cardKey)!;
+      if (balance > existing.balance) {
+        cardMap.set(cardKey, { balance, limit });
+      }
+    }
+  }
+  
+  // Sum up unique cards
+  for (const { balance, limit } of cardMap.values()) {
+    totalCreditUsed += balance;
+    totalCreditLimit += limit;
   }
 
   const utilization = totalCreditLimit > 0 
@@ -177,21 +229,28 @@ function calculateCreditAge(processedDocs: any[], allData: any[]) {
   const accountDates: Date[] = [];
   const accountTypes: string[] = [];
   
-  // Extract dates from all documents
+  // Extract dates from all documents - only count actual credit accounts (not bills)
   for (let i = 0; i < allData.length; i++) {
     const data = allData[i];
     const doc = processedDocs[i] || {};
-    if (data.created_at) {
-      accountDates.push(new Date(data.created_at));
-      // Determine account type
-      if (doc.creditCardBalance !== undefined) {
-        accountTypes.push('Credit Card');
-      } else if (doc.loanBalance !== undefined) {
-        accountTypes.push(doc.loanType || 'Loan');
-      } else if (doc.billAmount !== undefined) {
-        accountTypes.push('Bill');
-      } else {
-        accountTypes.push('Other');
+    
+    // Only count credit cards and loans as accounts (bills are recurring, not accounts)
+    const isCreditAccount = doc.creditCardBalance !== undefined || doc.loanBalance !== undefined;
+    
+    if (data.created_at && isCreditAccount) {
+      try {
+        accountDates.push(new Date(data.created_at));
+        // Determine account type
+        if (doc.creditCardBalance !== undefined) {
+          accountTypes.push('Credit Card');
+        } else if (doc.loanBalance !== undefined) {
+          accountTypes.push(doc.loanType ? doc.loanType.charAt(0).toUpperCase() + doc.loanType.slice(1) + ' Loan' : 'Loan');
+        } else {
+          accountTypes.push('Other');
+        }
+      } catch (e) {
+        // Skip invalid dates
+        console.warn('Invalid date in credit age calculation:', data.created_at);
       }
     }
   }
