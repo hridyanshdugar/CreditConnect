@@ -1,6 +1,7 @@
 'use client';
 
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Button, Link } from '@heroui/react';
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Button } from '@heroui/react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function AppNavbar({ user }: { user?: { id: string; email: string; role: string } | null }) {
@@ -12,50 +13,50 @@ export default function AppNavbar({ user }: { user?: { id: string; email: string
   };
 
   return (
-    <Navbar>
-      <NavbarBrand>
+    <Navbar maxWidth="full" className="px-4 sm:px-8 lg:px-12">
+      <NavbarBrand className="flex-grow-0 mr-auto">
         <Link href="/" className="font-bold text-inherit">
           Credit Connect
         </Link>
       </NavbarBrand>
-      <NavbarContent justify="end" className="gap-2">
+      <NavbarContent justify="end" className="gap-2 flex-grow-0 ml-auto">
         {user ? (
           <>
             {user.role === 'client' && (
               <>
                 <NavbarItem className="hidden sm:flex">
-                  <Link href="/client/dashboard" color="foreground">
+                  <Button as={Link} href="/client/dashboard" variant="flat" color="default">
                     Dashboard
-                  </Link>
+                  </Button>
                 </NavbarItem>
                 <NavbarItem className="hidden sm:flex">
-                  <Link href="/client/risk-profile" color="foreground">
+                  <Button as={Link} href="/client/risk-profile" variant="flat" color="default">
                     Risk Profile
-                  </Link>
+                  </Button>
                 </NavbarItem>
                 <NavbarItem className="hidden sm:flex">
-                  <Link href="/client/marketplace" color="foreground">
+                  <Button as={Link} href="/client/marketplace" variant="flat" color="default">
                     Marketplace
-                  </Link>
+                  </Button>
                 </NavbarItem>
               </>
             )}
             {user.role === 'bank' && (
               <>
                 <NavbarItem className="hidden sm:flex">
-                  <Link href="/bank/dashboard" color="foreground">
+                  <Button as={Link} href="/bank/dashboard" variant="flat" color="default">
                     Dashboard
-                  </Link>
+                  </Button>
                 </NavbarItem>
                 <NavbarItem className="hidden sm:flex">
-                  <Link href="/bank/portfolio" color="foreground">
+                  <Button as={Link} href="/bank/portfolio" variant="flat" color="default">
                     Portfolio
-                  </Link>
+                  </Button>
                 </NavbarItem>
                 <NavbarItem className="hidden sm:flex">
-                  <Link href="/bank/products" color="foreground">
+                  <Button as={Link} href="/bank/products" variant="flat" color="default">
                     Products
-                  </Link>
+                  </Button>
                 </NavbarItem>
               </>
             )}
@@ -68,14 +69,14 @@ export default function AppNavbar({ user }: { user?: { id: string; email: string
         ) : (
           <>
             <NavbarItem>
-              <Link href="/login" color="foreground">
+              <Button as={Link} href="/login" variant="flat" color="default">
                 Login
-              </Link>
+              </Button>
             </NavbarItem>
             <NavbarItem>
-              <Link href="/register" color="foreground">
+              <Button as={Link} href="/register" variant="flat" color="default">
                 Register
-              </Link>
+              </Button>
             </NavbarItem>
           </>
         )}
