@@ -330,13 +330,17 @@ export default function RiskProfilePage() {
                 <h3 className="text-xl font-semibold mb-2">No Risk Profile Yet</h3>
                 <p className="text-default-600 mb-6">
                   Upload your financial documents above to automatically calculate your Helix Risk Score. 
-                  We'll analyze your bank statements, pay stubs, and tax returns to provide you with 
-                  a comprehensive risk assessment.
+                  We'll analyze your bank statements, pay stubs, tax returns, credit cards, loans, bills, 
+                  and debt statements to provide you with a comprehensive risk assessment.
                 </p>
                 <div className="text-sm text-default-500 space-y-1">
                   <p>📄 Upload bank statements to analyze cash flow and payment history</p>
                   <p>💼 Upload pay stubs to verify income and employment</p>
                   <p>📊 Upload tax returns for comprehensive income verification</p>
+                  <p>💳 Upload credit card statements to assess credit utilization</p>
+                  <p>🏦 Upload loan statements to calculate debt-to-income ratio</p>
+                  <p>📋 Upload bills (utilities, rent) to evaluate payment consistency</p>
+                  <p>💸 Upload debt statements for complete debt analysis</p>
                 </div>
               </div>
             </CardBody>

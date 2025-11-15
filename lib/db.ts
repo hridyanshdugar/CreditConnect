@@ -239,5 +239,22 @@ export function initDatabase() {
 // Initialize on import
 initDatabase();
 
+// Conditionally seed demo data if enabled
+if (process.env.SEED_DEMO_DATA === 'true') {
+  // Use dynamic import to avoid circular dependencies and ensure async execution
+  import('./demo-data')
+    .then(({ seedDemoData }) => {
+      seedDemoData().catch((error) => {
+        console.error('Error seeding demo data:', error);
+      });
+    })
+    .catch((error) => {
+      // Only log if it's not a missing module error (expected if demo-data.ts doesn't exist)
+      if (!error.message?.includes('Cannot find module')) {
+        console.error('Error loading demo data script:', error);
+      }
+    });
+}
+
 export default db;
 

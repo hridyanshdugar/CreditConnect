@@ -145,7 +145,57 @@ The calculator:
 4. **Database initialization**
    The SQLite database will be automatically created on first run at the path specified in `DATABASE_PATH` (default: `data/creditconnect.db`). The directory will be created automatically if it doesn't exist.
 
-5. **Run the development server**
+5. **Enable Demo Data (Optional - for Investor Pitch)**
+   
+   To populate the database with demo data showcasing all features, add the following to your `.env` file:
+   ```env
+   SEED_DEMO_DATA=true
+   ```
+   
+   This will create:
+   - **3 Client Users** with different risk profiles (Prime, Near-Prime, Subprime)
+   - **5 Canadian Banks** (RBC, TD, Scotiabank, BMO, CIBC)
+   - **18+ Financial Products** (Credit Cards, Personal Loans, Auto Loans, Mortgages)
+   - **Risk Profiles** with historical data
+   - **Sample Applications** and **Pre-Approval Matches**
+   
+   **Demo Account Credentials:**
+   
+   **Client Accounts:**
+   - **Prime Customer** (Helix Score: ~18-22)
+     - Email: `prime@demo.com`
+     - Password: `Demo123!`
+   - **Near-Prime Customer** (Helix Score: ~38-42)
+     - Email: `nearprime@demo.com`
+     - Password: `Demo123!`
+   - **Subprime Customer** (Helix Score: ~58-62)
+     - Email: `subprime@demo.com`
+     - Password: `Demo123!`
+   
+   **Bank Accounts:**
+   - **Royal Bank of Canada (RBC)**
+     - Email: `rbc@demo.com`
+     - Password: `Demo123!`
+   - **Toronto-Dominion Bank (TD)**
+     - Email: `td@demo.com`
+     - Password: `Demo123!`
+   - **Bank of Nova Scotia (Scotiabank)**
+     - Email: `scotiabank@demo.com`
+     - Password: `Demo123!`
+   - **Bank of Montreal (BMO)**
+     - Email: `bmo@demo.com`
+     - Password: `Demo123!`
+   - **Canadian Imperial Bank of Commerce (CIBC)**
+     - Email: `cibc@demo.com`
+     - Password: `Demo123!`
+   
+   > **Note**: 
+   > - To **disable** demo data seeding, either remove `SEED_DEMO_DATA` from your `.env` file or set it to `false`
+   > - Demo data is only seeded when the server starts and `SEED_DEMO_DATA=true`
+   > - If demo users already exist, they will be preserved (the script checks for existing users)
+   > - Demo data includes realistic Canadian banking products based on actual offerings
+
+6. **Run the development server**
    ```bash
    npm run dev
    # or

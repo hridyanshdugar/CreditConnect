@@ -46,7 +46,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate data type
-    const allowedDataTypes = ['bank_statement', 'pay_stub', 'tax_return'];
+    const allowedDataTypes = [
+      'bank_statement', 
+      'pay_stub', 
+      'tax_return',
+      'credit_card_statement',
+      'loan_statement',
+      'debt_statement',
+      'bill'
+    ];
     if (!allowedDataTypes.includes(dataType)) {
       return NextResponse.json(
         { error: `Invalid data type. Allowed types: ${allowedDataTypes.join(', ')}` },

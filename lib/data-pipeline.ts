@@ -52,6 +52,18 @@ export class DataPipeline {
         case 'tax_return':
           processedData = await this.documentProcessor.processTaxReturn(filePath);
           break;
+        case 'credit_card_statement':
+          processedData = await this.documentProcessor.processCreditCardStatement(filePath);
+          break;
+        case 'loan_statement':
+          processedData = await this.documentProcessor.processLoanStatement(filePath);
+          break;
+        case 'debt_statement':
+          processedData = await this.documentProcessor.processDebtStatement(filePath);
+          break;
+        case 'bill':
+          processedData = await this.documentProcessor.processBill(filePath);
+          break;
         default:
           throw new Error(`Unsupported document type: ${fileData.data_type}`);
       }

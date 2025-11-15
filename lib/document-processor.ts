@@ -28,6 +28,29 @@ export interface ProcessedDocumentData {
     end: string;
   };
   taxYear?: string;
+  
+  // Credit Card Data
+  creditCardBalance?: number;
+  creditLimit?: number;
+  creditUtilization?: number;
+  minimumPayment?: number;
+  
+  // Loan Data
+  loanBalance?: number;
+  loanMonthlyPayment?: number;
+  loanType?: string;
+  loanInterestRate?: number;
+  
+  // Debt Data
+  totalDebt?: number;
+  debtMonthlyPayment?: number;
+  debtType?: string;
+  
+  // Bill Data
+  billAmount?: number;
+  billType?: string;
+  billDueDate?: string;
+  billPaymentStatus?: string;
 }
 
 export class DocumentProcessor {
@@ -222,6 +245,114 @@ export class DocumentProcessor {
 
     const netSavings = totalDeposits - totalWithdrawals;
     return (netSavings / totalDeposits) * 100;
+  }
+
+  async processCreditCardStatement(filePath: string): Promise<ProcessedDocumentData> {
+    if (!existsSync(filePath)) {
+      throw new Error('File not found');
+    }
+
+    const extracted = await this.ocrService.extractText(filePath, 'image/pdf');
+    const structuredData = this.ocrService.extractStructuredData(extracted.text, 'credit_card_statement');
+
+    const data: ProcessedDocumentData = {
+      creditCardBalance: structuredData.currentBalance,
+      creditLimit: structuredData.creditLimit,
+      creditUtilization: structuredData.creditUtilization,
+      minimumPayment: structuredData.minimumPayment,
+      transactions: structuredData.transactions || []
+    };
+
+    return data;
+  }
+
+  async processLoanStatement(filePath: string): Promise<ProcessedDocumentData> {
+    if (!existsSync(filePath)) {
+      throw new Error('File not found');
+    }
+
+    const extracted = await this.ocrService.extractText(filePath, 'image/pdf');
+    const structuredData = this.ocrService.extractStructuredData(extracted.text, 'loan_statement');
+
+    const data: ProcessedDocumentData = {
+      loanBalance: structuredData.loanBalance,
+      loanMonthlyPayment: structuredData.monthlyPayment,
+      loanType: structuredData.loanType,
+      loanInterestRate: structuredData.interestRate
+    };
+
+    return data;
+  }
+
+  async processDebtStatement(filePath: string): Promise<ProcessedDocumentData> {
+    if (!existsSync(filePath)) {
+      throw new Error('File not found');
+    }
+
+    const extracted = await this.ocrService.extractText(filePath, 'image/pdf');
+    const structuredData = this.ocrService.extractStructuredData(extracted.text, 'debt_statement');
+
+    const data: ProcessedDocumentData = {
+      totalDebt: structuredData.totalDebt,
+      debtMonthlyPayment: structuredData.monthlyPayment,
+      debtType: structuredData.debtType
+    };
+
+    return data;
+  }
+
+  async processBill(filePath: string): Promise<ProcessedDocumentData> {
+    if (!existsSync(filePath)) {
+      throw new Error('File not found');
+    }
+
+    const extracted = await this.ocrService.extractText(filePath, 'image/pdf');
+    const structuredData = this.ocrService.extractStructuredData(extracted.text, 'bill');
+
+    const data: ProcessedDocumentData = {
+      billAmount: structuredData.billAmount,
+      billType: structuredData.billType,
+      billDueDate: structuredData.dueDate,
+      billPaymentStatus: structuredData.paymentStatus
+    };
+
+    // Calculate payment timeliness for bills
+    if (structuredData.dueDate && structuredData.paymentStatus) {
+      data.paymentTimeliness = this.calculateBillPaymentTimeliness(
+        structuredData.dueDate,
+        structuredData.paymentStatus
+      );
+    }
+
+    return data;
+  }
+
+  private calculateBillPaymentTimeliness(dueDate: string, paymentStatus: string): number {
+    // If paid, assume on-time payment
+    if (paymentStatus === 'paid') {
+      return 100;
+    }
+    
+    // If unpaid or overdue, calculate based on how overdue
+    if (paymentStatus === 'overdue' || paymentStatus === 'past due') {
+      try {
+        const due = new Date(dueDate);
+        const now = new Date();
+        const daysOverdue = Math.floor((now.getTime() - due.getTime()) / (1000 * 60 * 60 * 24));
+        
+        // Penalize based on days overdue (max 50 point penalty)
+        return Math.max(0, 100 - Math.min(50, daysOverdue * 2));
+      } catch {
+        return 50; // Default if date parsing fails
+      }
+    }
+    
+    // If unpaid but not overdue yet, give partial credit
+    if (paymentStatus === 'unpaid') {
+      return 70;
+    }
+    
+    return 50; // Default
   }
 }
 

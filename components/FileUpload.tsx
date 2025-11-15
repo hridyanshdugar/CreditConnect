@@ -163,7 +163,7 @@ export default function FileUpload({ userId, onUploadComplete }: FileUploadProps
         <div>
           <h3 className="text-lg font-semibold mb-2">Upload Financial Documents</h3>
           <p className="text-sm text-default-600 mb-4">
-            Upload bank statements, pay stubs, or tax returns to automatically calculate your risk profile
+            Upload financial documents (bank statements, pay stubs, bills, loans, credit cards, debt statements) to automatically calculate your comprehensive risk profile
           </p>
         </div>
 
@@ -185,6 +185,18 @@ export default function FileUpload({ userId, onUploadComplete }: FileUploadProps
             </SelectItem>
             <SelectItem key="tax_return">
               Tax Return
+            </SelectItem>
+            <SelectItem key="credit_card_statement">
+              Credit Card Statement
+            </SelectItem>
+            <SelectItem key="loan_statement">
+              Loan Statement
+            </SelectItem>
+            <SelectItem key="debt_statement">
+              Debt Statement
+            </SelectItem>
+            <SelectItem key="bill">
+              Bill (Utility, Rent, etc.)
             </SelectItem>
           </Select>
 

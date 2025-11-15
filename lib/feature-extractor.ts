@@ -45,6 +45,15 @@ export class FeatureExtractor {
     // Extract debt features
     this.extractDebtFeatures(processedDocs, userData);
 
+    // Extract credit card features
+    this.extractCreditCardFeatures(processedDocs, userData);
+
+    // Extract loan features
+    this.extractLoanFeatures(processedDocs, userData);
+
+    // Extract bill payment features
+    this.extractBillPaymentFeatures(processedDocs, userData);
+
     // Set default values for missing critical fields
     this.setDefaults(userData);
 
@@ -175,7 +184,19 @@ export class FeatureExtractor {
     const debtPayments = this.identifyDebtPayments(allTransactions);
     const monthlyDebtPayments = this.calculateMonthlyDebtPayments(debtPayments);
 
-    if (userData.monthlyIncome && monthlyDebtPayments > 0) {
+    // Also extract from debt statements
+    const debtStatements = docs.filter(d => d.debtMonthlyPayment !== undefined);
+    if (debtStatements.length > 0) {
+      const debtStatementPayments = debtStatements
+        .map(d => d.debtMonthlyPayment || 0)
+        .reduce((a, b) => a + b, 0);
+      
+      const totalDebtPayments = monthlyDebtPayments + debtStatementPayments;
+      
+      if (userData.monthlyIncome && totalDebtPayments > 0) {
+        userData.debtToIncomeRatio = totalDebtPayments / userData.monthlyIncome;
+      }
+    } else if (userData.monthlyIncome && monthlyDebtPayments > 0) {
       userData.debtToIncomeRatio = monthlyDebtPayments / userData.monthlyIncome;
     }
 
@@ -260,6 +281,129 @@ export class FeatureExtractor {
     const stdDev = Math.sqrt(variance);
     
     return stdDev / avg; // Coefficient of variation
+  }
+
+  private extractCreditCardFeatures(
+    docs: ProcessedDocumentData[],
+    userData: UserData
+  ): void {
+    const creditCardStatements = docs.filter(d => d.creditCardBalance !== undefined);
+
+    if (creditCardStatements.length > 0) {
+      // Calculate average credit utilization across all cards
+      const utilizationRates = creditCardStatements
+        .filter(d => d.creditUtilization !== undefined)
+        .map(d => d.creditUtilization!);
+      
+      if (utilizationRates.length > 0) {
+        userData.creditUtilization = this.average(utilizationRates);
+      }
+
+      // Calculate total credit card debt
+      const totalCreditCardDebt = creditCardStatements
+        .filter(d => d.creditCardBalance !== undefined)
+        .reduce((sum, d) => sum + (d.creditCardBalance || 0), 0);
+
+      // Add minimum payments to debt calculations
+      const minimumPayments = creditCardStatements
+        .filter(d => d.minimumPayment !== undefined)
+        .map(d => d.minimumPayment!);
+      
+      if (minimumPayments.length > 0) {
+        const totalMinPayments = minimumPayments.reduce((a, b) => a + b, 0);
+        // This will be included in debt-to-income calculation
+        if (userData.monthlyIncome) {
+          const existingDebtRatio = userData.debtToIncomeRatio || 0;
+          const creditCardDebtRatio = totalMinPayments / userData.monthlyIncome;
+          userData.debtToIncomeRatio = existingDebtRatio + creditCardDebtRatio;
+        }
+      }
+    }
+  }
+
+  private extractLoanFeatures(
+    docs: ProcessedDocumentData[],
+    userData: UserData
+  ): void {
+    const loanStatements = docs.filter(d => d.loanMonthlyPayment !== undefined);
+
+    if (loanStatements.length > 0) {
+      // Calculate total monthly loan payments
+      const monthlyPayments = loanStatements
+        .map(d => d.loanMonthlyPayment || 0);
+      const totalLoanPayments = monthlyPayments.reduce((a, b) => a + b, 0);
+
+      // Add to debt-to-income ratio
+      if (userData.monthlyIncome && totalLoanPayments > 0) {
+        const existingDebtRatio = userData.debtToIncomeRatio || 0;
+        const loanDebtRatio = totalLoanPayments / userData.monthlyIncome;
+        userData.debtToIncomeRatio = existingDebtRatio + loanDebtRatio;
+      }
+
+      // Calculate total loan balances
+      const loanBalances = loanStatements
+        .filter(d => d.loanBalance !== undefined)
+        .map(d => d.loanBalance!);
+      
+      if (loanBalances.length > 0) {
+        const totalLoanBalance = loanBalances.reduce((a, b) => a + b, 0);
+        // Store for debt diversification calculation
+        userData.debtDiversification = loanStatements.length; // Number of different loans
+      }
+    }
+  }
+
+  private extractBillPaymentFeatures(
+    docs: ProcessedDocumentData[],
+    userData: UserData
+  ): void {
+    const bills = docs.filter(d => d.billAmount !== undefined);
+
+    if (bills.length > 0) {
+      // Extract payment timeliness from bills
+      const billPaymentScores = bills
+        .filter(d => d.paymentTimeliness !== undefined)
+        .map(d => d.paymentTimeliness!);
+      
+      if (billPaymentScores.length > 0) {
+        // Average bill payment timeliness
+        const avgBillPaymentScore = this.average(billPaymentScores);
+        
+        // Combine with existing payment timeliness if available
+        if (userData.paymentTimeliness !== undefined) {
+          userData.paymentTimeliness = (userData.paymentTimeliness + avgBillPaymentScore) / 2;
+        } else {
+          userData.paymentTimeliness = avgBillPaymentScore;
+        }
+
+        // Update bill payment consistency
+        userData.billPaymentConsistency = avgBillPaymentScore;
+
+        // Categorize bills by type for more granular analysis
+        const utilityBills = bills.filter(d => 
+          d.billType && ['electric', 'electricity', 'gas', 'water', 'sewer', 'internet', 'phone', 'utility'].includes(d.billType)
+        );
+        const rentBills = bills.filter(d => d.billType === 'rent');
+        
+        if (utilityBills.length > 0) {
+          const utilityScores = utilityBills
+            .filter(d => d.paymentTimeliness !== undefined)
+            .map(d => d.paymentTimeliness!);
+          if (utilityScores.length > 0) {
+            userData.utilityPaymentPatterns = this.average(utilityScores);
+          }
+        }
+
+        if (rentBills.length > 0) {
+          const rentScores = rentBills
+            .filter(d => d.paymentTimeliness !== undefined)
+            .map(d => d.paymentTimeliness!);
+          if (rentScores.length > 0) {
+            userData.rentPaymentHistory = this.average(rentScores);
+          }
+        }
+      }
+    }
   }
 }
 

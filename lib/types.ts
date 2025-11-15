@@ -165,7 +165,7 @@ export interface RiskAlert {
 export interface FinancialData {
   id: string;
   userId: string;
-  dataType: 'bank_statement' | 'pay_stub' | 'tax_return' | 'transaction' | 'balance';
+  dataType: 'bank_statement' | 'pay_stub' | 'tax_return' | 'credit_card_statement' | 'loan_statement' | 'debt_statement' | 'bill' | 'transaction' | 'balance';
   source?: string;
   rawData?: Record<string, any>;
   processedData?: Record<string, any>;
