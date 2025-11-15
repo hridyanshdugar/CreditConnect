@@ -3,10 +3,10 @@ import db from '@/lib/db';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
-    const { userId } = params;
+    const { userId } = await params;
 
     // Get current risk profile
     const currentProfile = db.prepare(`

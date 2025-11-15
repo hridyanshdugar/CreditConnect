@@ -18,22 +18,22 @@ export default function AppNavbar({ user }: { user?: { id: string; email: string
           Credit Connect
         </Link>
       </NavbarBrand>
-      <NavbarContent className="hidden sm:flex gap-4" justify="center">
+      <NavbarContent justify="end" className="gap-2">
         {user ? (
           <>
             {user.role === 'client' && (
               <>
-                <NavbarItem>
+                <NavbarItem className="hidden sm:flex">
                   <Link href="/client/dashboard" color="foreground">
                     Dashboard
                   </Link>
                 </NavbarItem>
-                <NavbarItem>
+                <NavbarItem className="hidden sm:flex">
                   <Link href="/client/risk-profile" color="foreground">
                     Risk Profile
                   </Link>
                 </NavbarItem>
-                <NavbarItem>
+                <NavbarItem className="hidden sm:flex">
                   <Link href="/client/marketplace" color="foreground">
                     Marketplace
                   </Link>
@@ -42,23 +42,28 @@ export default function AppNavbar({ user }: { user?: { id: string; email: string
             )}
             {user.role === 'bank' && (
               <>
-                <NavbarItem>
+                <NavbarItem className="hidden sm:flex">
                   <Link href="/bank/dashboard" color="foreground">
                     Dashboard
                   </Link>
                 </NavbarItem>
-                <NavbarItem>
+                <NavbarItem className="hidden sm:flex">
                   <Link href="/bank/portfolio" color="foreground">
                     Portfolio
                   </Link>
                 </NavbarItem>
-                <NavbarItem>
+                <NavbarItem className="hidden sm:flex">
                   <Link href="/bank/products" color="foreground">
                     Products
                   </Link>
                 </NavbarItem>
               </>
             )}
+            <NavbarItem>
+              <Button color="danger" variant="flat" onPress={handleLogout}>
+                Logout
+              </Button>
+            </NavbarItem>
           </>
         ) : (
           <>
@@ -73,15 +78,6 @@ export default function AppNavbar({ user }: { user?: { id: string; email: string
               </Link>
             </NavbarItem>
           </>
-        )}
-      </NavbarContent>
-      <NavbarContent justify="end">
-        {user && (
-          <NavbarItem>
-            <Button color="danger" variant="flat" onPress={handleLogout}>
-              Logout
-            </Button>
-          </NavbarItem>
         )}
       </NavbarContent>
     </Navbar>

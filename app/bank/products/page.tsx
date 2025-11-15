@@ -61,14 +61,14 @@ export default function ProductsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div>Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <AppNavbar user={user} />
       <main className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">

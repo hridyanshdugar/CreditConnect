@@ -6,10 +6,10 @@ const calculator = new HelixRiskCalculator();
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
-    const { userId } = params;
+    const { userId } = await params;
 
     // Get current risk profile
     const profile = db.prepare(`

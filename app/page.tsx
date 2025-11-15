@@ -7,8 +7,10 @@ import { useEffect, useState } from 'react';
 
 export default function Home() {
   const [user, setUser] = useState<any>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const token = localStorage.getItem('token');
     if (token) {
       fetch('/api/auth/me', {
@@ -30,11 +32,11 @@ export default function Home() {
           <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Credit Connect
           </h1>
-          <p className="text-2xl text-gray-600 mb-8">
+          <p className="text-2xl text-foreground-500 mb-8">
             AI-Powered Lending Platform with Proprietary Risk Assessment
           </p>
           <div className="flex gap-4 justify-center">
-            {!user ? (
+            {!mounted || !user ? (
               <>
                 <Link href="/register">
                   <Button color="primary" size="lg">
