@@ -81,23 +81,64 @@ async function createDemoUsers() {
       firstName: 'Sarah',
       lastName: 'Chen',
       profile: {
+        // Financial Stability Metrics
         monthlyIncome: 8500,
+        monthlyIncomeVariance: 0.02, // Very stable income (2% variance)
         employmentDuration: 72, // 6 years at current job
-        debtToIncomeRatio: 0.22, // $1,870 monthly debt payments / $8,500 income
-        paymentTimeliness: 98,
+        multipleIncomeStreams: 2, // Salary + investment income
+        seasonalityPatterns: { Q1: 1.0, Q2: 1.0, Q3: 1.0, Q4: 1.05 }, // Slight bonus in Q4
         averageMonthlyBalance: 18000,
+        overdraftFrequency: 0, // Never overdrafts
         savingsRate: 0.25, // Saves 25% of income
         emergencyFundCoverage: 8, // 8 months of expenses saved
-        propertyOwnership: true,
-        vehicleOwnership: true,
-        investmentAccounts: 3, // RRSP, TFSA, Investment account
-        educationLevel: 90, // University degree
-        residentialStability: 60, // 5 years at current address
+        debtToIncomeRatio: 0.22, // $1,870 monthly debt payments / $8,500 income
+        paymentTimeliness: 98,
+        creditUtilization: 12, // Low utilization
+        debtDiversification: 0.6, // Mix of mortgage, car loan, credit cards
+        
+        // Behavioral Risk Indicators
+        discretionarySpendingRatio: 0.25, // 25% discretionary spending
+        gamblingActivity: 0, // No gambling
+        luxurySpendingTrends: 15, // Minimal luxury spending
+        budgetAdherence: 95, // Excellent budget adherence
         billPaymentConsistency: 98,
         rentPaymentHistory: 100, // Owns property, no rent
         utilityPaymentPatterns: 98,
-        creditUtilization: 12, // Low utilization
-        multipleIncomeStreams: 1,
+        subscriptionManagement: 95, // Well-managed subscriptions
+        appEngagementFrequency: 90, // High app engagement
+        documentSubmissionTimeliness: 100, // Always submits on time
+        profileCompleteness: 100, // Complete profile
+        fraudRiskSignals: 5, // Very low fraud risk
+        
+        // Alternative Data Signals
+        professionalNetworkStrength: 85, // Strong professional network
+        educationLevel: 90, // University degree
+        skillMarketability: 88, // Highly marketable skills
+        geographicStability: 60, // 5 years at current location
+        vehicleOwnership: true,
+        propertyOwnership: true,
+        investmentAccounts: 3, // RRSP, TFSA, Investment account
+        businessOwnership: false,
+        residentialStability: 60, // 5 years at current address
+        familyStructure: 'married_with_children',
+        healthInsuranceCoverage: true,
+        professionalLicenses: 2, // Professional certifications
+        
+        // Market & Economic Environment Risk
+        industryVolatility: 20, // Low volatility industry (tech/finance)
+        regionalEconomicHealth: 85, // Strong regional economy (Toronto)
+        interestRateTrends: -10, // Slight decrease in rates
+        inflationImpact: 25, // Low inflation impact
+        
+        // Fraud & Security Risk
+        documentAuthenticity: 98, // High document authenticity
+        biometricMatchScore: 95, // Strong biometric match
+        addressVerification: true,
+        phoneNumberStability: 84, // 7 years with same number
+        unusualTransferPatterns: 5, // Very low unusual patterns
+        velocityChecks: 3, // Low velocity risk
+        geolocationAnomalies: 2, // Minimal location anomalies
+        deviceFingerprinting: 92, // Consistent device usage
       },
     },
     {
@@ -105,23 +146,64 @@ async function createDemoUsers() {
       firstName: 'Michael',
       lastName: 'Rodriguez',
       profile: {
+        // Financial Stability Metrics
         monthlyIncome: 5200,
+        monthlyIncomeVariance: 0.08, // Moderate income variance (8%)
         employmentDuration: 24, // 2 years at current job
-        debtToIncomeRatio: 0.38, // $1,976 monthly debt payments / $5,200 income
-        paymentTimeliness: 85,
+        multipleIncomeStreams: 1,
+        seasonalityPatterns: { Q1: 0.95, Q2: 1.0, Q3: 1.05, Q4: 1.0 }, // Some seasonal variation
         averageMonthlyBalance: 3500,
+        overdraftFrequency: 2, // Occasional overdrafts (2 per year)
         savingsRate: 0.12, // Saves 12% of income
         emergencyFundCoverage: 3, // 3 months of expenses saved
-        propertyOwnership: false,
-        vehicleOwnership: true,
-        investmentAccounts: 1, // Just a TFSA
-        educationLevel: 70, // Some college/trade school
-        residentialStability: 18, // 1.5 years at current address
+        debtToIncomeRatio: 0.38, // $1,976 monthly debt payments / $5,200 income
+        paymentTimeliness: 85,
+        creditUtilization: 38, // Moderate utilization
+        debtDiversification: 0.4, // Mix of car loan and credit cards
+        
+        // Behavioral Risk Indicators
+        discretionarySpendingRatio: 0.35, // 35% discretionary spending
+        gamblingActivity: 5, // Minimal gambling activity
+        luxurySpendingTrends: 30, // Some luxury spending
+        budgetAdherence: 75, // Good budget adherence
         billPaymentConsistency: 85,
         rentPaymentHistory: 88, // Rents, mostly on time
         utilityPaymentPatterns: 82,
-        creditUtilization: 38, // Moderate utilization
-        multipleIncomeStreams: 1,
+        subscriptionManagement: 70, // Moderate subscription management
+        appEngagementFrequency: 75, // Good app engagement
+        documentSubmissionTimeliness: 80, // Usually submits on time
+        profileCompleteness: 85, // Mostly complete profile
+        fraudRiskSignals: 15, // Low fraud risk
+        
+        // Alternative Data Signals
+        professionalNetworkStrength: 65, // Moderate professional network
+        educationLevel: 70, // Some college/trade school
+        skillMarketability: 68, // Moderately marketable skills
+        geographicStability: 18, // 1.5 years at current location
+        vehicleOwnership: true,
+        propertyOwnership: false,
+        investmentAccounts: 1, // Just a TFSA
+        businessOwnership: false,
+        residentialStability: 18, // 1.5 years at current address
+        familyStructure: 'single',
+        healthInsuranceCoverage: true,
+        professionalLicenses: 1, // One professional license
+        
+        // Market & Economic Environment Risk
+        industryVolatility: 40, // Moderate volatility industry (retail/services)
+        regionalEconomicHealth: 70, // Moderate regional economy
+        interestRateTrends: 5, // Slight increase in rates
+        inflationImpact: 45, // Moderate inflation impact
+        
+        // Fraud & Security Risk
+        documentAuthenticity: 85, // Good document authenticity
+        biometricMatchScore: 80, // Good biometric match
+        addressVerification: true,
+        phoneNumberStability: 36, // 3 years with same number
+        unusualTransferPatterns: 15, // Some unusual patterns
+        velocityChecks: 12, // Low-medium velocity risk
+        geolocationAnomalies: 10, // Some location anomalies
+        deviceFingerprinting: 75, // Mostly consistent device usage
       },
     },
     {
@@ -129,23 +211,64 @@ async function createDemoUsers() {
       firstName: 'James',
       lastName: 'Thompson',
       profile: {
+        // Financial Stability Metrics
         monthlyIncome: 3200,
+        monthlyIncomeVariance: 0.15, // High income variance (15%)
         employmentDuration: 8, // 8 months at current job
-        debtToIncomeRatio: 0.58, // $1,856 monthly debt payments / $3,200 income
-        paymentTimeliness: 68,
+        multipleIncomeStreams: 1,
+        seasonalityPatterns: { Q1: 0.90, Q2: 1.0, Q3: 0.95, Q4: 1.15 }, // High seasonal variation
         averageMonthlyBalance: 800,
+        overdraftFrequency: 8, // Frequent overdrafts (8 per year)
         savingsRate: 0.03, // Saves only 3% of income
         emergencyFundCoverage: 0.5, // Less than 1 month saved
-        propertyOwnership: false,
-        vehicleOwnership: false,
-        investmentAccounts: 0,
-        educationLevel: 50, // High school diploma
-        residentialStability: 6, // 6 months at current address
+        debtToIncomeRatio: 0.58, // $1,856 monthly debt payments / $3,200 income
+        paymentTimeliness: 68,
+        creditUtilization: 75, // High utilization
+        debtDiversification: 0.2, // Mostly credit card debt
+        
+        // Behavioral Risk Indicators
+        discretionarySpendingRatio: 0.45, // 45% discretionary spending
+        gamblingActivity: 25, // Some gambling activity
+        luxurySpendingTrends: 50, // High luxury spending relative to income
+        budgetAdherence: 55, // Poor budget adherence
         billPaymentConsistency: 65,
         rentPaymentHistory: 70, // Rents, sometimes late
         utilityPaymentPatterns: 60,
-        creditUtilization: 75, // High utilization
-        multipleIncomeStreams: 1,
+        subscriptionManagement: 50, // Poor subscription management
+        appEngagementFrequency: 45, // Low app engagement
+        documentSubmissionTimeliness: 60, // Often submits late
+        profileCompleteness: 65, // Incomplete profile
+        fraudRiskSignals: 35, // Moderate fraud risk
+        
+        // Alternative Data Signals
+        professionalNetworkStrength: 40, // Weak professional network
+        educationLevel: 50, // High school diploma
+        skillMarketability: 45, // Lower marketability
+        geographicStability: 6, // 6 months at current location
+        vehicleOwnership: false,
+        propertyOwnership: false,
+        investmentAccounts: 0,
+        businessOwnership: false,
+        residentialStability: 6, // 6 months at current address
+        familyStructure: 'single',
+        healthInsuranceCoverage: false,
+        professionalLicenses: 0, // No professional licenses
+        
+        // Market & Economic Environment Risk
+        industryVolatility: 65, // High volatility industry (gig economy/retail)
+        regionalEconomicHealth: 55, // Weaker regional economy
+        interestRateTrends: 15, // Increasing rates
+        inflationImpact: 70, // High inflation impact
+        
+        // Fraud & Security Risk
+        documentAuthenticity: 70, // Lower document authenticity
+        biometricMatchScore: 65, // Lower biometric match
+        addressVerification: false,
+        phoneNumberStability: 12, // 1 year with same number
+        unusualTransferPatterns: 40, // Higher unusual patterns
+        velocityChecks: 35, // Higher velocity risk
+        geolocationAnomalies: 30, // More location anomalies
+        deviceFingerprinting: 55, // Inconsistent device usage
       },
     },
   ];
