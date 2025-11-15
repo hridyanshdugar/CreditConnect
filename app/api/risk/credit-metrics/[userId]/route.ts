@@ -105,30 +105,39 @@ function calculatePaymentHistory(processedDocs: any[], allData: any[]) {
       
       if (billData && billData.billPaymentStatus) {
         if (billData.billPaymentStatus === 'paid') {
-          // Keep on-time if already on-time, but don't override a worse status
+          // Keep current status (don't downgrade from worse to better)
+          // If already on-time, stay on-time
           if (status === 'on-time') {
             status = 'on-time';
           }
+          // Otherwise keep the worse status
         } else if (billData.billPaymentStatus === 'overdue' || billData.billPaymentStatus === 'past due') {
           // Calculate days overdue
+          let newStatus: 'on-time' | 'late-30' | 'late-60' | 'missed' = 'late-30';
+          
           if (billData.billDueDate) {
             try {
               const dueDate = new Date(billData.billDueDate);
               const daysOverdue = Math.floor((now.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
               if (daysOverdue >= 60) {
-                status = 'missed';
+                newStatus = 'missed';
               } else if (daysOverdue >= 30) {
-                status = status === 'missed' ? 'missed' : 'late-60';
+                newStatus = 'late-60';
               } else {
-                status = status === 'missed' || status === 'late-60' ? status : 'late-30';
+                newStatus = 'late-30';
               }
             } catch {
-              status = status === 'missed' || status === 'late-60' ? status : 'late-30';
+              newStatus = 'late-30';
             }
-          } else {
-            status = status === 'missed' || status === 'late-60' ? status : 'late-30';
+          }
+          
+          // Only update if the new status is worse than current
+          if (newStatus === 'missed' || (newStatus === 'late-60' && status !== 'missed') || 
+              (newStatus === 'late-30' && status === 'on-time')) {
+            status = newStatus;
           }
         } else {
+          // Unpaid or unknown status = missed
           status = 'missed';
         }
       }
