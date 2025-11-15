@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardBody, CardHeader, Button, Progress, Chip } from '@heroui/react';
 import AppNavbar from '@/components/Navbar';
 import Link from 'next/link';
+import { BarChart3, ShoppingBag, TrendingUp } from 'lucide-react';
 
 export default function ClientDashboard() {
   const router = useRouter();
@@ -146,34 +147,64 @@ export default function ClientDashboard() {
         )}
 
         <div className="grid md:grid-cols-3 gap-6">
-          <Card isPressable as={Link} href="/client/risk-profile">
-            <CardHeader>
-              <h3 className="text-lg font-semibold">Risk Profile</h3>
+          <Card 
+            isPressable 
+            as={Link} 
+            href="/client/risk-profile"
+            className="hover:scale-105 transition-transform duration-200 hover:shadow-lg"
+          >
+            <CardHeader className="flex flex-col items-start gap-2 pb-2">
+              <div className="flex items-center gap-3 w-full">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <BarChart3 className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold">Risk Profile</h3>
+              </div>
             </CardHeader>
-            <CardBody>
-              <p className="text-sm text-gray-600">
+            <CardBody className="pt-0">
+              <p className="text-sm text-default-600">
                 View detailed risk assessment and improvement recommendations
               </p>
             </CardBody>
           </Card>
 
-          <Card isPressable as={Link} href="/client/marketplace">
-            <CardHeader>
-              <h3 className="text-lg font-semibold">Pre-Approval Marketplace</h3>
+          <Card 
+            isPressable 
+            as={Link} 
+            href="/client/marketplace"
+            className="hover:scale-105 transition-transform duration-200 hover:shadow-lg"
+          >
+            <CardHeader className="flex flex-col items-start gap-2 pb-2">
+              <div className="flex items-center gap-3 w-full">
+                <div className="p-2 rounded-lg bg-success/10">
+                  <ShoppingBag className="w-6 h-6 text-success" />
+                </div>
+                <h3 className="text-lg font-semibold">Pre-Approval Marketplace</h3>
+              </div>
             </CardHeader>
-            <CardBody>
-              <p className="text-sm text-gray-600">
+            <CardBody className="pt-0">
+              <p className="text-sm text-default-600">
                 Browse pre-approved loan offers from multiple lenders
               </p>
             </CardBody>
           </Card>
 
-          <Card isPressable as={Link} href="/client/simulator">
-            <CardHeader>
-              <h3 className="text-lg font-semibold">Risk Simulator</h3>
+          <Card 
+            isPressable 
+            as={Link} 
+            href="/client/simulator"
+            className="hover:scale-105 transition-transform duration-200 hover:shadow-lg"
+          >
+            <CardHeader className="flex flex-col items-start gap-2 pb-2">
+              <div className="flex items-center gap-3 w-full">
+                <div className="p-2 rounded-lg bg-warning/10">
+                  <TrendingUp className="w-6 h-6 text-warning" />
+                </div>
+                <h3 className="text-lg font-semibold">Risk Simulator</h3>
+              </div>
             </CardHeader>
-            <CardBody>
-              <p className="text-sm text-gray-600">
+            <CardBody className="pt-0">
+              <p className="text-sm text-default-600">
                 Simulate how different actions affect your risk score
               </p>
             </CardBody>
