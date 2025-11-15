@@ -355,7 +355,9 @@ export class HelixRiskCalculator {
     }
 
     if (userData.budgetAdherence !== undefined) {
-      spendingScore = (spendingScore + userData.budgetAdherence) / 2;
+      // Higher budget adherence = lower risk = lower score
+      const adherenceScore = 100 - userData.budgetAdherence;
+      spendingScore = (spendingScore + adherenceScore) / 2;
       factors.push(`Budget adherence: ${userData.budgetAdherence}%`);
     }
 
@@ -376,12 +378,16 @@ export class HelixRiskCalculator {
       .map((m) => m.value!);
 
     if (paymentScores.length > 0) {
-      responsibilityScore = paymentScores.reduce((a, b) => a + b, 0) / paymentScores.length;
-      factors.push(`Payment consistency: ${responsibilityScore.toFixed(1)}%`);
+      const avgPaymentConsistency = paymentScores.reduce((a, b) => a + b, 0) / paymentScores.length;
+      // Higher payment consistency = lower risk = lower score
+      responsibilityScore = 100 - avgPaymentConsistency;
+      factors.push(`Payment consistency: ${avgPaymentConsistency.toFixed(1)}%`);
     }
 
     if (userData.subscriptionManagement !== undefined) {
-      responsibilityScore = (responsibilityScore + userData.subscriptionManagement) / 2;
+      // Higher subscription management = lower risk = lower score
+      const subScore = 100 - userData.subscriptionManagement;
+      responsibilityScore = (responsibilityScore + subScore) / 2;
       factors.push(`Subscription management: ${userData.subscriptionManagement}%`);
     }
 
@@ -444,25 +450,32 @@ export class HelixRiskCalculator {
     let socialScore = 50;
 
     if (userData.professionalNetworkStrength !== undefined) {
-      socialScore += (userData.professionalNetworkStrength - 50) * 0.4;
+      // Higher network strength = lower risk = lower score
+      socialScore -= (userData.professionalNetworkStrength - 50) * 0.4;
       factors.push(`Professional network: ${userData.professionalNetworkStrength}%`);
     }
 
     if (userData.educationLevel !== undefined) {
-      socialScore += (userData.educationLevel - 50) * 0.3;
+      // Higher education = lower risk = lower score
+      socialScore -= (userData.educationLevel - 50) * 0.3;
       factors.push(`Education level: ${userData.educationLevel}%`);
     }
 
     if (userData.skillMarketability !== undefined) {
-      socialScore += (userData.skillMarketability - 50) * 0.2;
+      // Higher skill marketability = lower risk = lower score
+      socialScore -= (userData.skillMarketability - 50) * 0.2;
       factors.push(`Skill marketability: ${userData.skillMarketability}%`);
     }
 
     if (userData.geographicStability !== undefined) {
+      // Higher geographic stability = lower risk = lower score
       const stabilityScore = Math.min(100, (userData.geographicStability / 24) * 100);
-      socialScore = (socialScore + stabilityScore) / 2;
+      const invertedStability = 100 - stabilityScore;
+      socialScore = (socialScore + invertedStability) / 2;
       factors.push(`Geographic stability: ${userData.geographicStability} months`);
     }
+
+    socialScore = Math.max(0, Math.min(100, socialScore));
 
     score += socialScore * socialWeight;
 
@@ -470,26 +483,28 @@ export class HelixRiskCalculator {
     const assetWeight = 0.4;
     let assetScore = 50;
 
+    // More assets = lower risk = lower score
     if (userData.vehicleOwnership) {
-      assetScore += 15;
+      assetScore -= 15;
       factors.push('Vehicle ownership: Yes');
     }
 
     if (userData.propertyOwnership) {
-      assetScore += 25;
+      assetScore -= 25;
       factors.push('Property ownership: Yes');
     }
 
     if (userData.investmentAccounts !== undefined) {
-      assetScore += Math.min(20, userData.investmentAccounts * 5);
+      assetScore -= Math.min(20, userData.investmentAccounts * 5);
       factors.push(`Investment accounts: ${userData.investmentAccounts}`);
     }
 
     if (userData.businessOwnership) {
-      assetScore += 20;
+      assetScore -= 20;
       factors.push('Business ownership: Yes');
     }
 
+    assetScore = Math.max(0, Math.min(100, assetScore));
     score += assetScore * assetWeight;
 
     // Lifestyle Stability (30% weight)
@@ -497,20 +512,25 @@ export class HelixRiskCalculator {
     let lifestyleScore = 50;
 
     if (userData.residentialStability !== undefined) {
+      // Higher residential stability = lower risk = lower score
       const residentialScore = Math.min(100, (userData.residentialStability / 24) * 100);
-      lifestyleScore = residentialScore;
+      lifestyleScore = 100 - residentialScore; // Invert: high stability = low score
       factors.push(`Residential stability: ${userData.residentialStability} months`);
     }
 
     if (userData.healthInsuranceCoverage) {
-      lifestyleScore += 15;
+      // Having health insurance = lower risk = lower score
+      lifestyleScore -= 15;
       factors.push('Health insurance: Yes');
     }
 
     if (userData.professionalLicenses !== undefined) {
-      lifestyleScore += Math.min(15, userData.professionalLicenses * 5);
+      // More professional licenses = lower risk = lower score
+      lifestyleScore -= Math.min(15, userData.professionalLicenses * 5);
       factors.push(`Professional licenses: ${userData.professionalLicenses}`);
     }
+
+    lifestyleScore = Math.max(0, Math.min(100, lifestyleScore));
 
     score += lifestyleScore * lifestyleWeight;
 
