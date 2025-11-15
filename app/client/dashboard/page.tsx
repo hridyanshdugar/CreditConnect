@@ -149,7 +149,7 @@ export default function ClientDashboard() {
 
         {/* Credit Score Breakdown */}
         <div className="mb-8">
-          <CreditScoreBreakdown />
+          {/* <CreditScoreBreakdown /> */}
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
