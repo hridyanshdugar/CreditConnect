@@ -120,10 +120,12 @@ The calculator:
 
 2. **Install dependencies**
    ```bash
-   npm install
+   npm install --legacy-peer-deps
    # or
    pnpm install
    ```
+   
+   > **Note**: If you encounter peer dependency conflicts, use `--legacy-peer-deps` flag with npm. This is safe as the dependencies are compatible but npm's strict peer dependency checking may flag them.
 
 3. **Set up environment variables**
    Create a `.env.local` file in the root directory:
