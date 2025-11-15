@@ -1,0 +1,186 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Card, CardBody, CardHeader, Button, Progress, Chip } from '@heroui/react';
+import AppNavbar from '@/components/Navbar';
+import Link from 'next/link';
+
+export default function ClientDashboard() {
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+  const [riskProfile, setRiskProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+      return;
+    }
+
+    fetch('/api/auth/me', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user) {
+          setUser(data.user);
+          // Fetch risk profile
+          fetch(`/api/risk/profile/${data.user.id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+            .then((res) => res.json())
+            .then((profile) => {
+              if (profile.currentProfile) {
+                setRiskProfile(profile.currentProfile);
+              }
+            })
+            .catch(() => {});
+        } else {
+          router.push('/login');
+        }
+      })
+      .catch(() => {
+        router.push('/login');
+      })
+      .finally(() => setLoading(false));
+  }, [router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div>Loading...</div>
+      </div>
+    );
+  }
+
+  const getRiskColor = (score: number) => {
+    if (score <= 25) return 'success';
+    if (score <= 45) return 'primary';
+    if (score <= 65) return 'warning';
+    return 'danger';
+  };
+
+  const getRiskLabel = (category: string) => {
+    const labels: Record<string, string> = {
+      prime: 'Prime',
+      near_prime: 'Near Prime',
+      subprime: 'Subprime',
+      deep_subprime: 'Deep Subprime',
+      decline: 'Decline',
+    };
+    return labels[category] || category;
+  };
+
+  return (
+    <div className="min-h-screen">
+      <AppNavbar user={user} />
+      <main className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-8">Client Dashboard</h1>
+
+        {riskProfile ? (
+          <div className="grid md:grid-cols-2 gap-6 mb-8">
+            <Card>
+              <CardHeader>
+                <h2 className="text-xl font-semibold">Helix Risk Score</h2>
+              </CardHeader>
+              <CardBody>
+                <div className="text-center">
+                  <div className="text-6xl font-bold mb-4" style={{ color: `var(--${getRiskColor(riskProfile.helixScore)}-500)` }}>
+                    {riskProfile.helixScore.toFixed(1)}
+                  </div>
+                  <Chip color={getRiskColor(riskProfile.helixScore)} variant="flat" size="lg">
+                    {getRiskLabel(riskProfile.riskCategory)}
+                  </Chip>
+                  <div className="mt-4">
+                    <Progress
+                      value={100 - riskProfile.helixScore}
+                      color={getRiskColor(riskProfile.helixScore)}
+                      className="max-w-md"
+                    />
+                    <p className="text-sm text-gray-500 mt-2">
+                      Lower scores indicate lower risk
+                    </p>
+                  </div>
+                </div>
+              </CardBody>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <h2 className="text-xl font-semibold">Dimension Scores</h2>
+              </CardHeader>
+              <CardBody>
+                <div className="space-y-4">
+                  {Object.entries(riskProfile.dimensionScores || {}).map(([key, value]: [string, any]) => (
+                    <div key={key}>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-sm capitalize">{key.replace('_', ' ')}</span>
+                        <span className="text-sm font-semibold">{value.toFixed(1)}</span>
+                      </div>
+                      <Progress
+                        value={100 - value}
+                        color={getRiskColor(value)}
+                        size="sm"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </CardBody>
+            </Card>
+          </div>
+        ) : (
+          <Card className="mb-8">
+            <CardBody>
+              <p className="text-center py-8">
+                No risk profile found. Calculate your risk score to get started.
+              </p>
+              <div className="text-center">
+                <Link href="/client/risk-profile">
+                  <Button color="primary">Calculate Risk Profile</Button>
+                </Link>
+              </div>
+            </CardBody>
+          </Card>
+        )}
+
+        <div className="grid md:grid-cols-3 gap-6">
+          <Card isPressable as={Link} href="/client/risk-profile">
+            <CardHeader>
+              <h3 className="text-lg font-semibold">Risk Profile</h3>
+            </CardHeader>
+            <CardBody>
+              <p className="text-sm text-gray-600">
+                View detailed risk assessment and improvement recommendations
+              </p>
+            </CardBody>
+          </Card>
+
+          <Card isPressable as={Link} href="/client/marketplace">
+            <CardHeader>
+              <h3 className="text-lg font-semibold">Pre-Approval Marketplace</h3>
+            </CardHeader>
+            <CardBody>
+              <p className="text-sm text-gray-600">
+                Browse pre-approved loan offers from multiple lenders
+              </p>
+            </CardBody>
+          </Card>
+
+          <Card isPressable as={Link} href="/client/simulator">
+            <CardHeader>
+              <h3 className="text-lg font-semibold">Risk Simulator</h3>
+            </CardHeader>
+            <CardBody>
+              <p className="text-sm text-gray-600">
+                Simulate how different actions affect your risk score
+              </p>
+            </CardBody>
+          </Card>
+        </div>
+      </main>
+    </div>
+  );
+}
+
