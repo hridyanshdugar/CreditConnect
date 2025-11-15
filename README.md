@@ -128,17 +128,22 @@ The calculator:
    > **Note**: If you encounter peer dependency conflicts, use `--legacy-peer-deps` flag with npm. This is safe as the dependencies are compatible but npm's strict peer dependency checking may flag them.
 
 3. **Set up environment variables**
-   Create a `.env.local` file in the root directory:
+   Create a `.env` file in the root directory (you can copy from `.env.example`):
    ```env
    JWT_SECRET=your-secret-key-change-in-production
+   DATABASE_PATH=./data/creditconnect.db
    ```
-   > **Note**: Use a strong, random secret key in production. You can generate one using:
-   > ```bash
-   > node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-   > ```
+   
+   > **Note**: 
+   > - Use a strong, random secret key in production. You can generate one using:
+   >   ```bash
+   >   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+   >   ```
+   > - `DATABASE_PATH` can be an absolute path or relative to the project root. Default is `./data/creditconnect.db`
+   > - The `.env` file is already in `.gitignore` and will not be committed to version control
 
 4. **Database initialization**
-   The SQLite database will be automatically created on first run in the `data/` directory. No manual setup required.
+   The SQLite database will be automatically created on first run at the path specified in `DATABASE_PATH` (default: `data/creditconnect.db`). The directory will be created automatically if it doesn't exist.
 
 5. **Run the development server**
    ```bash
@@ -407,7 +412,9 @@ Match loan products to a user's risk profile.
 - **Secure Headers**: Next.js security headers enabled
 
 ### Data Protection
-- Database stored locally in `data/` directory (excluded from git)
+- Database path configurable via `DATABASE_PATH` environment variable (default: `data/creditconnect.db`)
+- Database files excluded from git (see `.gitignore`)
+- `.env` file excluded from git to protect secrets
 - Sensitive data not logged in production
 - JWT secrets should be strong and kept secure
 
@@ -489,7 +496,9 @@ Try these sample inputs to see different risk categories:
 
 ### Authentication Issues
 - Clear browser localStorage if token issues occur
-- Check that `JWT_SECRET` is set in `.env.local`
+- Check that `JWT_SECRET` is set in `.env` file
+- Ensure `.env` file exists in the project root directory
+- The app will throw an error on startup if `JWT_SECRET` is missing
 
 ### Build Issues
 - Run `npm install` or `pnpm install` to ensure all dependencies are installed

@@ -2,7 +2,13 @@ import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 
-const dbPath = path.join(process.cwd(), 'data', 'creditconnect.db');
+// Get database path from environment variable or use default
+const defaultDbPath = path.join(process.cwd(), 'data', 'creditconnect.db');
+const dbPath = process.env.DATABASE_PATH 
+  ? path.isAbsolute(process.env.DATABASE_PATH)
+    ? process.env.DATABASE_PATH
+    : path.join(process.cwd(), process.env.DATABASE_PATH)
+  : defaultDbPath;
 const dbDir = path.dirname(dbPath);
 
 // Ensure data directory exists
